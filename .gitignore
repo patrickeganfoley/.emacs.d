@@ -1,0 +1,14 @@
+secrets.el
+*~ 
+*#
+abbrev_defs
+ac-comphist.dat
+elpa/
+eshell/
+ido.last
+keyhistory
+old_emacs_dot_git/
+request/
+smex-items
+themes/
+url/
