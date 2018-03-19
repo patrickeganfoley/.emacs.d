@@ -130,7 +130,7 @@ VALUE from 0 = transparent, 100 = opaque"
   :ensure t
   ;;  I can't unbind C-c C-t from cycle-themes
   ;;  no matter how hard I try.  ) :
-  :bind (("C-c C-y" . cycle-themes))
+  :bind (("C-c C-y" . cycle-themes-next))
   :init (setq cycle-themes-theme-list
 	      '(sanityinc-solarized-light
 		sanityinc-solarized-dark
@@ -147,7 +147,7 @@ VALUE from 0 = transparent, 100 = opaque"
 	    (cycle-themes-mode)
 	    (setq cycle-themes-mode-map
       (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "C-c C-y") 'cycle-themes)
+	(define-key map (kbd "C-c C-y") 'cycle-themes-next)
 	map))
 	    )
 )
@@ -155,6 +155,19 @@ VALUE from 0 = transparent, 100 = opaque"
 
 ;; Things I looked at and turned off
 ;;   *  smart-parens
+
+
+(use-package rainbow-delimiters
+  ;; I can't see what's going on in lisp code.
+  ;; Maybe this will help.
+  :ensure t
+  :init
+  (progn
+    (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
+  )
+)
+
+
 
 (use-package multiple-cursors
   :ensure t
