@@ -130,7 +130,7 @@ VALUE from 0 = transparent, 100 = opaque"
   :ensure t
   ;;  I can't unbind C-c C-t from cycle-themes
   ;;  no matter how hard I try.  ) :
-  :bind (("C-c C-y" . cycle-themes-next))
+  :bind (("C-c C-y" . cycle-themes))
   :init (setq cycle-themes-theme-list
 	      '(sanityinc-solarized-light
 		sanityinc-solarized-dark
@@ -147,7 +147,7 @@ VALUE from 0 = transparent, 100 = opaque"
 	    (cycle-themes-mode)
 	    (setq cycle-themes-mode-map
       (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "C-c C-y") 'cycle-themes-next)
+	(define-key map (kbd "C-c C-y") 'cycle-themes)
 	map))
 	    )
 )
