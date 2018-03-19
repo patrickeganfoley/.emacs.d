@@ -14,3 +14,6 @@ themes/
 url/
 keystrokes
 games/
+
+#  I would like to not use this at all
+custom.el
