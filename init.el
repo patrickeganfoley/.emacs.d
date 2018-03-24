@@ -505,6 +505,17 @@ Don't know what ARG does."
   (setq sql-product product)
   (sql-connect connection))
 
+(defun set-sql-buffer ()
+  "Point to *SQL*."
+  ; (interactive "b")
+  ;  We can probably provide a default arg.
+  ;  Should figure out how soon.
+  (interactive)
+  (setq sql-buffer "*SQL*"))
+
+(global-set-key (kbd "C-c q") 'set-sql-bufer)
+
+
 ;; This contains some sql db locations and passwords
 ;; It is not on github. 
 (load-file "~/.emacs.d/secrets.el")
