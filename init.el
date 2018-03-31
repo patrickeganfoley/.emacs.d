@@ -42,8 +42,6 @@
   (exec-path-from-shell-initialize))
 
 
-
-
 (use-package osx-browse
   :ensure t)
 
@@ -646,6 +644,13 @@ Don't know what ARG does."
   :mode "\\.yaml\\'"
   :mode "\\.portal\\'"
   )
+
+
+(use-package projectile
+  :ensure t
+  :bind-keymap
+  ("C-c p" . projectile-command-map))
+
 
 ;;  dired-mode stuff
 ;;  sets default to be human readable sizes
