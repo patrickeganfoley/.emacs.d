@@ -552,6 +552,15 @@ Don't know what ARG does."
 	  )
 )
 
+
+(use-package vmd-mode
+  :ensure t
+  :init (progn
+	  ;; (add-hook 'markdown-mode-hook 'vmd-mode)
+	  ;; (global-set-key (kbd "M-m p") 'vmd-mode)
+	  )
+)
+
 ;;  Org Mode stuff org-mode org .org orgmode
 ;;  Don't use use-package, it's already in 
 ;;  vanilla emacs.
@@ -678,6 +687,7 @@ Version 2015-07-30
 (eval-after-load "dired" '(progn
   (define-key dired-mode-map (kbd "s") 'xah-dired-sort) ))
 
+(load-theme 'sanityinc-solarized-light t t)
 
 ;; Slack
 ;; (use-package slack
