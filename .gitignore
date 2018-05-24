@@ -17,3 +17,5 @@ games/
 
 #  I would like to not use this at all
 custom.el
+
+flycheck_init.el
