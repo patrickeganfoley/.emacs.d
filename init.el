@@ -353,14 +353,22 @@ Don't know what ARG does."
 ;; so I think I'm using flake8.
 
 
+(use-package flycheck-mypy
+  :ensure t
+  :config (progn
+      (setq flycheck-python-mypy-executable "mypy")
+      (setq flycheck-python-mypy-args "--py2")
+      )
+)
+
 ;;  I also installed sqlint with
-;;  gem install sqlint 
+;;  gem install sqlint
 ;;  https://github.com/purcell/sqlint
 ;;  But I'll bet it defaults to postgres and I'd like
-;;  to find a hivesql checker 
+;;  to find a hivesql checker
 ;;  other than https://sql.treasuredata.com
 ;;  This is another option for psql https://github.com/markdrago/pgsanity
-;;  The only things I could find for hive are 
+;;  The only things I could find for hive are
 ;;  https://github.com/mayanhui/Hive-SQL-Syntax-Checker and an 
 ;;  inactive fork that are 5 and 3 years old.
 
