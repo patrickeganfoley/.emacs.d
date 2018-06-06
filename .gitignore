@@ -16,6 +16,7 @@ keystrokes
 games/
 
 #  I would like to not use this at all
-custom.el
+#  custom.el
+#  turns out I need it.
 
 flycheck_init.el
