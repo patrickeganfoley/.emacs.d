@@ -369,12 +369,12 @@ Don't know what ARG does."
 ;;  other than https://sql.treasuredata.com
 ;;  This is another option for psql https://github.com/markdrago/pgsanity
 ;;  The only things I could find for hive are
-;;  https://github.com/mayanhui/Hive-SQL-Syntax-Checker and an 
+;;  https://github.com/mayanhui/Hive-SQL-Syntax-Checker and an
 ;;  inactive fork that are 5 and 3 years old.
 
 ;;  Auto-pep8
 ;;  yapf is yet another python formatter, maintained
-;;  by google.  
+;;  by google.
 ;;  To edit defaults, go to ~/.config/yapf/style
 (use-package py-yapf
   :ensure t)
@@ -495,11 +495,6 @@ Don't know what ARG does."
   (interactive)
   (let ((sql-product 'presto))
     (sql-connect 'presto)))
-
-
-(defun sql-comint-presto (product options)
-  (let ((sql-login-delay 0.9))
-    (sql-comint product options)))
 
 
 (defun sql-redshift ()
