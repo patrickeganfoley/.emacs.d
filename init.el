@@ -132,14 +132,6 @@ VALUE from 0 = transparent, 100 = opaque"
   :init (setq cycle-themes-theme-list
 	      '(sanityinc-solarized-light
 		sanityinc-solarized-dark
-		sanityinc-tomorrow-day
-		sanityinc-tomorrow-night
-		sanityinc-tomorrow-eighties
-		sanityinc-tomorrow-bright
-		sanityinc-tomorrow-blue
-		clues
-		darcula
-		danneskjold
 		monokai))
   :config (progn
 	    (cycle-themes-mode)
@@ -149,6 +141,17 @@ VALUE from 0 = transparent, 100 = opaque"
 	map))
 	    )
 )
+
+;; Dropped these themes
+;; sanityinc-tomorrow-day
+;; sanityinc-tomorrow-night
+;; sanityinc-tomorrow-eighties
+;; sanityinc-tomorrow-bright
+;; sanityinc-tomorrow-blue
+;; clues
+;; darcula
+;; danneskjold
+
 
 
 ;; Things I looked at and turned off
@@ -346,6 +349,9 @@ Don't know what ARG does."
   :init (global-flycheck-mode)
   ;; Use C-c ! v to check out flycheck settings
   ;; Use C-c ! n to check the next error!
+  ;; :config (progn
+  ;;     (setq flycheck-emacs-lisp-checkdoc-executable "/Users/patrickfoley/checkdoc.el/checkdoc.el")
+  ;;    )
 )
 ;; Python has several syntax checkers,
 ;; pep8, pyflakes (flake8 includes both), pylint and pychecker
@@ -486,6 +492,8 @@ Don't know what ARG does."
 (setq sql-connection-alist '() )
 
 ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
+(defvar sql-presto-program)
+(defvar sql-presto-login-params)
 (setq sql-presto-program "sane-presto"
       sql-presto-login-params '((user :default "patrick")
                                 (database :default "")))
@@ -633,12 +641,13 @@ Don't know what ARG does."
 )
 
 ;;  R / ESS 
-(use-package ess
-  :ensure t
-  :mode (("\\.r\\'" . r-mode)
-	 ("\\.R\\'" . r-mode))
-  :init (require 'ess-site)
+ (use-package ess
+   :ensure t
+   :mode (("\\.r\\'" . r-mode)
+ 	 ("\\.R\\'" . r-mode))
 )
+;; I cannot get ess-site to work with use-package.
+
 
 
 ;;  Does this have to come after rmode?

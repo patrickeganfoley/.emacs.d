@@ -36,7 +36,7 @@
  '(main-line-color2 "#333343")
  '(package-selected-packages
    (quote
-    (flycheck-mypy vmd-mode projectile rainbow-delimiters ess company multiple-cursors go-mode scala-mode org-mode osx-browse exec-path-from-shell restclient slack zenburn-theme zenburn yaml-mode white-sand-theme use-package smex smartparens py-yapf polymode monokai-theme markdown-mode magit latex-preview-pane latex-pretty-symbols latex-math-preview google-this github-theme gh-md flymake-yaml flycheck ess-smart-equals emacsql-psql ein darcula-theme danneskjold-theme cycle-themes company-jedi color-theme-zenburn color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-theme-github clues-theme browse-at-remote)))
+    (ess-site flycheck-mypy vmd-mode projectile rainbow-delimiters ess company multiple-cursors go-mode scala-mode org-mode osx-browse exec-path-from-shell restclient slack zenburn-theme zenburn yaml-mode white-sand-theme use-package smex smartparens py-yapf polymode monokai-theme markdown-mode magit latex-preview-pane latex-pretty-symbols latex-math-preview google-this github-theme gh-md flymake-yaml flycheck ess-smart-equals emacsql-psql ein darcula-theme danneskjold-theme cycle-themes company-jedi color-theme-zenburn color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-theme-github clues-theme browse-at-remote)))
  '(powerline-color1 "#222232")
  '(powerline-color2 "#333343"))
 
