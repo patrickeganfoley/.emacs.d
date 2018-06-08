@@ -492,6 +492,13 @@ Don't know what ARG does."
 (setq sql-connection-alist '() )
 
 ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
+(defun sql-comint-presto (product options)
+  "Connect to presto.
+PRODUCT should be psql and you can pass OPTIONS."
+  (let ((sql-login-delay 0.9))
+    (sql-comint product options)))
+
+
 (defvar sql-presto-program)
 (defvar sql-presto-login-params)
 (setq sql-presto-program "sane-presto"
@@ -511,6 +518,8 @@ Don't know what ARG does."
   (my-sql-connect 'postgres 'redshift))
 
 (defun my-sql-connect (product connection)
+  "Connect to a sql product.
+PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift or presto)"
   (setq sql-product product)
   (sql-connect connection))
 
@@ -526,21 +535,21 @@ Don't know what ARG does."
 
 
 ;; This contains some sql db locations and passwords
-;; It is not on github. 
+;; It is not on github.
 (load-file "~/.emacs.d/secrets.el")
 
 ;; Fonts
 ;; I want orgmode and markdowns to use variable width fonts.
 ;; Use variable width font faces in current buffer
 ;;  This line just declares a variable that apparently
-;;  is defined in some other package.  
+;;  is defined in some other package.
 ;;  See https://emacs.stackexchange.com/questions/21245/dealing-with-warning-assignment-to-free-variable-when-certain-libraries-can-b for why it' necessary.
 (defvar buffer-face-mode-face)
 (defun variable-font-buffer ()
    "Set font to a variable width (proportional) fonts in current buffer.  Taken from https://emacs.stackexchange.com/a/3044."
    (interactive)
    (setq buffer-face-mode-face '(
-	 :family "Times New Roman" 
+	 :family "Times New Roman"
          :height 200
         ))
    (buffer-face-mode)
@@ -557,7 +566,7 @@ Don't know what ARG does."
   :init (progn
 	  (setq markdown-command "multimarkdown")
 	  ;; This does not work.  It is using a weird old definition.
-	  ;;  It doesn't use the serif font. 
+	  ;;  It doesn't use the serif font.
 	  (add-hook 'markdown-mode-hook 'variable-font-buffer)
 	  (add-hook 'gfm-mode-hook 'variable-font-buffer)
 	  )
@@ -573,11 +582,11 @@ Don't know what ARG does."
 )
 
 ;;  Org Mode stuff org-mode org .org orgmode
-;;  Don't use use-package, it's already in 
+;;  Don't use use-package, it's already in
 ;;  vanilla emacs.
-(require 'ox-md nil t) 
+(require 'ox-md nil t)
 ;;  cycle-themes took C-c C-t...
-(eval-after-load 'org-mode 
+(eval-after-load 'org-mode
   '(define-key org-mode-map (kbd "C-c C-t") 'org-todo)
 )
 ;; ... why do I need to do this???
@@ -600,7 +609,7 @@ Don't know what ARG does."
 
 ;; I don't like how you can't really
 ;; move the cursor in this.
-;;  I also changed it from ansi-term to term.  
+;;  I also changed it from ansi-term to term.
 ;; 
 ;;  eshell     - really weird input prompt (unicode or something)
 ;;  ansi-term  - no tab complete
