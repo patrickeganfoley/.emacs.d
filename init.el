@@ -454,7 +454,7 @@ Don't know what ARG does."
   )
 
 (defun paste-from-clipboard ()
-  "Paste like OSX."
+  "Paste like  OSX."
   (interactive)
   (if (display-graphic-p)
       (progn
@@ -491,14 +491,12 @@ Don't know what ARG does."
 ;;  I add stuff to this in secrets.el
 (setq sql-connection-alist '() )
 
+;; This contains some sql db locations and passwords
+;; It is not on github.
+(load-file "~/.emacs.d/secrets.el")
+
+
 ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
-(defun sql-comint-presto (product options)
-  "Connect to presto.
-PRODUCT should be psql and you can pass OPTIONS."
-  (let ((sql-login-delay 0.9))
-    (sql-comint product options)))
-
-
 (defvar sql-presto-program)
 (defvar sql-presto-login-params)
 (setq sql-presto-program "sane-presto"
@@ -508,8 +506,23 @@ PRODUCT should be psql and you can pass OPTIONS."
 (defun sql-presto ()
   "Connect to presto."
   (interactive)
+  ;; (my-sql-connect 'postgres 'presto)
   (let ((sql-product 'presto))
-    (sql-connect 'presto)))
+  (sql-connect 'presto)
+  ))
+
+
+(defun sql-comint-presto (product options x)
+  "Interactive connection to presto.
+PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
+We don't know what X is."
+  (let ((sql-login-delay 0.9))
+    (message "%S" product)
+    (message "%S" options)
+    (message "%S" x)
+    (sql-comint product options)))
+
+
 
 
 (defun sql-redshift ()
@@ -534,9 +547,6 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
 (global-set-key (kbd "C-c q") 'set-sql-bufer)
 
 
-;; This contains some sql db locations and passwords
-;; It is not on github.
-(load-file "~/.emacs.d/secrets.el")
 
 ;; Fonts
 ;; I want orgmode and markdowns to use variable width fonts.
