@@ -34,6 +34,10 @@
   (package-install 'use-package))
 
 
+(use-package google-this
+  :ensure t
+)
+
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
@@ -43,6 +47,9 @@
 
 
 (use-package osx-browse
+  ;; This provides lisp functions to
+  ;; open safari.
+  ;; It's necessary for things like browse-at-remote.
   :ensure t)
 
 
@@ -658,6 +665,8 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
         ein:jupyter-server-args (list "--no-browser")
   )
 )
+
+
 
 ;;  R / ESS 
  (use-package ess
