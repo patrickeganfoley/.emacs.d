@@ -486,7 +486,14 @@ Don't know what ARG does."
 
 ;;  don't need the redshift stuff or anything else other than
 ;;  `sane-presto` and the presto stuf.
-(require 'sql)
+
+
+(use-package sql
+  :ensure t
+  :init (progn
+	  (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
+	  )
+  )
 
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
