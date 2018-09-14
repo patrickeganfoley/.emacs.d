@@ -714,9 +714,27 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
 
 
 (use-package projectile
+  ;; http://batsov.com/projectile/
+  ;; projectile highly recommends the fix-ido package.
+  ;; Maybe I should use it.
+  ;; Useful Commands:
+  ;;    C-c p s g  Run grep on the files in the project.    
+  ;;    C-c p b  Display a list of all project buffers currently open (for current project).    
+  ;;    C-c p p  Display a list of known projects you can switch to.    
+  ;;    C-c p r  Runs interactive query-replace on all files in the projects.    
+  ;;    C-c p s s  Runs ag on the project. Requires the presence of ag.el.    
+  ;;    C-c p C-h (shows all projectile bindings)
+  ;;    (This is recommended instead of projectile isearch) 
   :ensure t
   :bind-keymap
-  ("C-c p" . projectile-command-map))
+  ("C-c p" . projectile-command-map)
+  :config (prog
+	   (setq projectile-enable-caching t)
+	   (setq projectile-switch-project-action 'projectile-dired)
+	   )
+)
+
+
 
 
 ;;  dired-mode stuff
