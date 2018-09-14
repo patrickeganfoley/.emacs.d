@@ -61,6 +61,12 @@
 )
 
 
+;; TeX
+(use-package latex-math-preview
+  :ensure t
+)
+
+
 ;; Custom tries to put auto-generated code in your init.el
 ;; This will prevent that.
 ;; https://emacs.stackexchange.com/a/29746
@@ -682,6 +688,11 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
  	 ("\\.R\\'" . r-mode))
 )
 ;; I cannot get ess-site to work with use-package.
+;; I still haven't gotten it to work, but I'll 
+;; take notes here.
+;;
+;;  I manually installed ess and ess-R-object-popup
+
 
 
 
