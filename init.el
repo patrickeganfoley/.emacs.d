@@ -1,6 +1,9 @@
 ;;; init.el --- P Foley emacs configs
 ;;; Commentary:
 
+;;  rebuilding with [these instructions](https://news.ycombinator.com/item?id=9595396)
+;;  I want svg support for eww.
+
 ;; * (interactive) means you can call a function with M-x
 ;;  <function-name>
 
@@ -723,8 +726,8 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
   ;;    C-c p p  Display a list of known projects you can switch to.    
   ;;    C-c p r  Runs interactive query-replace on all files in the projects.    
   ;;    C-c p s s  Runs ag on the project. Requires the presence of ag.el.    
-  ;;    C-c p C-h (shows all projectile bindings)
   ;;    (This is recommended instead of projectile isearch) 
+  ;;    C-c p C-h (shows all projectile bindings)
   :ensure t
   :bind-keymap
   ("C-c p" . projectile-command-map)
