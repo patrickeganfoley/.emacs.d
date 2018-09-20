@@ -3,6 +3,31 @@
 
 ;;  rebuilding with [these instructions](https://news.ycombinator.com/item?id=9595396)
 ;;  I want svg support for eww.
+;;  That worked.  But you need a few changes:
+(setq mac-command-modifier 'meta ;; I want this to do nothing.
+      ;;  TODO: Change command to be command.
+      mac-option-modifier 'meta)
+;;  Your options here are
+;;    * control  (standard C-x)
+;;    * meta     (standard M-x)
+;;    * alt      ????
+;;    * hyper    no major/minor modes use these - so do whatever you want
+;;    * super    no major/minor modes use these - so do whatever you want
+;;  Let me look up what it is in the other emacs.
+;;  Other emacs says
+;; mac-command-modifier is a variable defined in ‘ns-win.el’.
+;; Its value is ‘meta’
+;;   This variable is an alias for ‘ns-command-modifier’.
+;;  So this is probably only defined in emacs-mac.
+
+
+;;  emacs-mac also has slightly different fullscreen support.
+;;  https://github.com/joostkremers/writeroom-mode/issues/34
+;;  You can get fullscren by calling M-x toggle-frame-fullscreen
+
+
+
+
 
 ;; * (interactive) means you can call a function with M-x
 ;;  <function-name>
