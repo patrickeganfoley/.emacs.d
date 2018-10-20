@@ -4,6 +4,12 @@
 ;;  rebuilding with [these instructions](https://news.ycombinator.com/item?id=9595396)
 ;;  I want svg support for eww.
 ;;  That worked.  But you need a few changes:
+;;  This version is at /usr/local/Cellar/emacs-mac/emacs-26.1-z-mac-7.2/Emacs.app/Contents/MacOS/Emacs
+;;  You'll want to set up an alias.
+;;  I set up an alias to `memacs` rather than `emacs` because I couldn't
+;;  delete the Emacs in /usr/bin/local.  It's restricted by OSX.
+;;  I could probably get around that w/ the CMD-R + csrutil disable thing,
+;;  but I don't want to attempt until I upgrade to mojave.
 (setq mac-command-modifier 'meta ;; I want this to do nothing.
       ;;  TODO: Change command to be command.
       mac-option-modifier 'meta)
@@ -74,6 +80,13 @@
   (exec-path-from-shell-initialize))
 
 
+(use-package tramp
+  ;; C-x C-f <ip-address>:<path_to_file>
+  ;; or cd <ip-address>:<path_to_file>
+  ;; You can use it to edit files
+  ;; inside docker containers too!
+  :ensure t)
+
 (use-package osx-browse
   ;; This provides lisp functions to
   ;; open safari.
@@ -101,6 +114,9 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load-file custom-file)
 
+;; emacs is too slow in eshell when printing job logs
+;; https://stackoverflow.com/questions/26985772/fast-emacs-shell-mode
+;; comint-move-point-for-output and comint-scroll-show-maximum-output to  nil
 
 
 ;; This is me trying to learn lisp
@@ -230,6 +246,14 @@ VALUE from 0 = transparent, 100 = opaque"
             (setq magit-push-arguments '("--set-upstream")))) ;aka -u
 
 
+;; (use-package magithub
+;;   :ensure t
+;;   :after magit
+;;   :config
+;;   (magithub-feature-autoinject t)
+;;   (defvar magithub-clone-default-directory)
+;;   (setq magithub-clone-default-directory "~/"))
+
 ;; ido is 'interactively do' things
 ;; it powers smex but also lets you find files
 ;; anywhere.  same with buffers
@@ -340,6 +364,21 @@ Don't know what ARG does."
 	(select-window (funcall selector)))
       (setq arg (if (plusp arg) (1- arg) (1+ arg))))))
 
+;; Zooms in on one buffer.  Let's you zoom back out.
+;; Think of it as like narrowing but for buffers
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Narrowing.html
+;; code from https://gist.github.com/mads-hartmann/3402786#gistcomment-693878
+(defun toggle-maximize-buffer () "Maximize buffer."
+  (interactive)
+  (if (= 1 (length (window-list)))
+      (jump-to-register '_)
+    (progn
+      (window-configuration-to-register '_)
+      (delete-other-windows))))
+;;  Good tips on keybinding conventions
+;; https://emacs.stackexchange.com/questions/42164/convention-about-using-c-x-or-c-c-as-prefix-keys
+(global-set-key (kbd "C-c z") 'toggle-maximize-buffer)
+
 
 
 ;;  Autocomplete
@@ -398,6 +437,10 @@ Don't know what ARG does."
 ;; pep8, pyflakes (flake8 includes both), pylint and pychecker
 ;; I don't know which I am using.  I have pep8 and pyflakes,
 ;; so I think I'm using flake8.
+
+;;  I want the linter to check for errors in
+;; library usage too https://emacs.stackexchange.com/questions/13823/flycheck-check-python-module-import
+;; 
 
 
 (use-package flycheck-mypy
@@ -526,17 +569,39 @@ Don't know what ARG does."
   :ensure t
   :init (progn
 	  (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
+  ;; This is great!  You can sort sql results
+  ;; after they show up if you forgot to in the query!
+  ;; C-c ^ will sort!
 	  )
+  :hook
+  (sql-mode . enable-sql-upcase)
+  (sql-interactive-mode . enable-sql-upcase)
+
+  :config
+  (define-abbrev-table 'sql-mode-abbrev-table
+    (mapcar #'(lambda (v) (list v (upcase v) nil 1))
+            '("absolute" "action" "add" "after" "all" "allocate" "alter" "and" "any" "are" "array" "as" "asc" "asensitive" "assertion" "asymmetric" "at" "atomic" "authorization" "avg" "before" "begin" "between" "bigint" "binary" "bit" "bitlength" "blob" "boolean" "both" "breadth" "by" "call" "called" "cascade" "cascaded" "case" "cast" "catalog" "char" "char_length" "character" "character_length" "check" "clob" "close" "coalesce" "collate" "collation" "column" "commit" "condition" "connect" "connection" "constraint" "constraints" "constructor" "contains" "continue" "convert" "corresponding" "count" "create" "cross" "cube" "current" "current_date" "current_default_transform_group" "current_path" "current_role" "current_time" "current_timestamp" "current_transform_group_for_type" "current_user" "cursor" "cycle" "data" "date" "day" "deallocate" "dec" "decimal" "declare" "default" "deferrable" "deferred" "delete" "depth" "deref" "desc" "describe" "descriptor" "deterministic" "diagnostics" "disconnect" "distinct" "do" "domain" "double" "drop" "dynamic" "each" "element" "else" "elseif" "end" "equals" "escape" "except" "exception" "exec" "execute" "exists" "exit" "external" "extract" "false" "fetch" "filter" "first" "float" "for" "foreign" "found" "free" "from" "full" "function" "general" "get" "global" "go" "goto" "grant" "group" "grouping" "handler" "having" "hold" "hour" "identity" "if" "immediate" "in" "indicator" "initially" "inner" "inout" "input" "insensitive" "insert" "int" "integer" "intersect" "interval" "into" "is" "isolation" "iterate" "join" "key" "language" "large" "last" "lateral" "leading" "leave" "left" "level" "like" "limit" "local" "localtime" "localtimestamp" "locator" "loop" "lower" "map" "match" "map" "member" "merge" "method" "min" "minute" "modifies" "module" "month" "multiset" "names" "national" "natural" "nchar" "nclob" "new" "next" "no" "none" "not" "null" "nullif" "numeric" "object" "octet_length" "of" "old" "on" "only" "open" "option" "or" "order" "ordinality" "out" "outer" "output" "over" "overlaps" "pad" "parameter" "partial" "partition" "path" "position" "precision" "prepare" "preserve" "primary" "prior" "privileges" "procedure" "public" "range" "read" "reads" "real" "recursive" "ref" "references" "referencing" "relative" "release" "repeat" "resignal" "restrict" "result" "return" "returns" "revoke" "right" "role" "rollback" "rollup" "routine" "row" "rows" "savepoint" "schema" "scope" "scroll" "search" "second" "section" "select" "sensitive" "session" "session_user" "set" "sets" "signal" "similar" "size" "smallint" "some" "space" "specific" "specifictype" "sql" "sqlcode" "sqlerror" "sqlexception" "sqlstate" "sqlwarning" "start" "state" "static" "submultiset" "substring" "sum" "symmetric" "system" "system_user" "table" "tablesample" "temporary" "then" "time" "timestamp" "timezone_hour" "timezone_minute" "to" "trailing" "transaction" "translate" "translation" "treat" "trigger" "trim" "true" "under" "undo" "union" "unique" "unknown" "unnest" "until" "update" "upper" "usage" "user" "using" "value" "values" "varchar" "varying" "view" "when" "whenever" "where" "while" "window" "with" "within" "without" "work" "write" "year" "zone" "greatest" "least")))
+
+  (defun enable-sql-upcase ()
+    (abbrev-mode 1)
+    ;; Make underscore a word character so that abbrev stops expanding
+    ;; send_count to send_COUNT
+    (modify-syntax-entry ?_ "w" sql-mode-syntax-table))
+
   )
+
 
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
             (toggle-truncate-lines t)))
 
+(defvar sql-postgres-program)
 (setq sql-postgres-program "/usr/local/bin/psql")
+(defvar sql-send-terminator)
 (setq sql-send-terminator t)
 
 ;;  I add stuff to this in secrets.el
+(defvar sql-connection-alist)
 (setq sql-connection-alist '() )
 
 ;; This contains some sql db locations and passwords
@@ -738,10 +803,15 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
   :ensure t
   :mode "\\.yaml\\'"
   :mode "\\.portal\\'"
+  :mode "\\.portal_monitoring\\'"
   )
 
 
 (use-package projectile
+  ;; NOTE - you use this mostly for C-c p s g and C-c p r
+  ;; but using M-s . is also really nice!!
+  ;; https://stackoverflow.com/a/1775184
+  ;; 
   ;; http://batsov.com/projectile/
   ;; projectile highly recommends the fix-ido package.
   ;; Maybe I should use it.
@@ -756,7 +826,7 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
   :ensure t
   :bind-keymap
   ("C-c p" . projectile-command-map)
-  :config (prog
+  :config (progn
 	   (setq projectile-enable-caching t)
 	   (setq projectile-switch-project-action 'projectile-dired)
 	   )
