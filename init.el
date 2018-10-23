@@ -727,7 +727,8 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
 	 ("\\.Rmd\\'" . poly-markdown+r-mode))
   :init
   (progn
-    (require 'poly-R)
+    ;; I do not understand why this does not work.
+    ;;(require 'poly-R)
     (require 'poly-markdown)))
 
 ;; I don't like how you can't really
@@ -861,7 +862,7 @@ Version 2015-07-30
 (eval-after-load "dired" '(progn
   (define-key dired-mode-map (kbd "s") 'xah-dired-sort) ))
 
-(load-theme 'sanityinc-solarized-light t t)
+(load-theme 'sanityinc-solarized-light t)
 
 ;; Slack
 ;; (use-package slack
