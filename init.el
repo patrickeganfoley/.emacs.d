@@ -163,6 +163,7 @@ VALUE from 0 = transparent, 100 = opaque"
 ;;  https://github.com/bbatsov/solarized-emacs/blob/master/solarized.el#L1400
 ;;  Going to try this https://emacs.stackexchange.com/a/17962
 ;;  Use list-faces-display to see all faces shown anywhere
+;;  Use M-x describe-face to see the face at cursor
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config (progn (load-theme 'sanityinc-solarized-dark t t)
@@ -170,12 +171,12 @@ VALUE from 0 = transparent, 100 = opaque"
 
       (custom-theme-set-faces
        'sanityinc-solarized-light
-       `(magit-something ((t (:foreground ,black))))
+       `(git-commit-summary ((t (:foreground ,"black"))))
        )
 
       (custom-theme-set-faces
        'sanityinc-solarized-dark
-       `(magit-something ((t (:foreground ,black))))
+       `(git-commit-summary ((t (:foreground ,"black"))))
        )
 ))
 
