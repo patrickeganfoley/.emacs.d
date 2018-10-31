@@ -162,12 +162,21 @@ VALUE from 0 = transparent, 100 = opaque"
 ;;  for examples / magit face names, see
 ;;  https://github.com/bbatsov/solarized-emacs/blob/master/solarized.el#L1400
 ;;  Going to try this https://emacs.stackexchange.com/a/17962
+;;  Use list-faces-display to see all faces shown anywhere
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config (progn (load-theme 'sanityinc-solarized-dark t t)
                  (load-theme 'sanityinc-solarized-light t t)
-	       
 
+      (custom-theme-set-faces
+       'sanityinc-solarized-light
+       `(magit-something ((t (:foreground ,black))))
+       )
+
+      (custom-theme-set-faces
+       'sanityinc-solarized-dark
+       `(magit-something ((t (:foreground ,black))))
+       )
 ))
 
 (use-package color-theme-sanityinc-tomorrow
