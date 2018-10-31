@@ -155,10 +155,20 @@ VALUE from 0 = transparent, 100 = opaque"
   (set-frame-parameter (selected-frame) 'alpha value))
 
 
+
+;; I want to change how the themes look in some places.
+;;  It looks like themes have 'faces' and I should
+;;  be able to change them with custom-them-set-face
+;;  for examples / magit face names, see
+;;  https://github.com/bbatsov/solarized-emacs/blob/master/solarized.el#L1400
+;;  Going to try this https://emacs.stackexchange.com/a/17962
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config (progn (load-theme 'sanityinc-solarized-dark t t)
-                 (load-theme 'sanityinc-solarized-light t t)))
+                 (load-theme 'sanityinc-solarized-light t t)
+	       
+
+))
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
@@ -564,6 +574,8 @@ Don't know what ARG does."
 ;;  don't need the redshift stuff or anything else other than
 ;;  `sane-presto` and the presto stuf.
 
+;;  
+(require 'sql)
 
 (use-package sql
   :ensure t
