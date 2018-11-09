@@ -164,23 +164,14 @@ VALUE from 0 = transparent, 100 = opaque"
 ;;  Going to try this https://emacs.stackexchange.com/a/17962
 ;;  Use list-faces-display to see all faces shown anywhere
 ;;  Use M-x describe-face to see the face at cursor
+;;  I'm still struggling to get some faces overwritten.
+;;  I've now put it at the end of the init.el
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config (progn (load-theme 'sanityinc-solarized-dark t t)
                  (load-theme 'sanityinc-solarized-light t t)
-
-      (custom-theme-set-faces
-       'sanityinc-solarized-light
-       `(git-commit-summary ((t (:foreground ,"black"))))
-       `(ein:cell-input-area ((t (:foreground ,"black"))))
-       `(ein:cell-input-area ((t (:background ,"fdf6e3"))))
-       )
-
-      (custom-theme-set-faces
-       'sanityinc-solarized-dark
-       `(git-commit-summary ((t (:foreground ,"black"))))
-       )
-))
+		 )
+)
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
@@ -896,6 +887,20 @@ Version 2015-07-30
   (define-key dired-mode-map (kbd "s") 'xah-dired-sort) ))
 
 (load-theme 'sanityinc-solarized-light t)
+
+(message "Setting custom faces for solarized light")
+(custom-theme-set-faces
+    'sanityinc-solarized-light
+        `(git-commit-summary ((t (:foreground ,"black"))))
+        `(ein:cell-input-area ((t (:foreground ,"black"))))
+        `(ein:cell-input-area ((t (:background ,"fdf6e3"))))
+)
+
+(message "Setting custom faces for solarized dark")
+(custom-theme-set-faces
+    'sanityinc-solarized-dark
+        `(git-commit-summary ((t (:foreground ,"black"))))
+ )
 
 ;; Slack
 ;; (use-package slack
