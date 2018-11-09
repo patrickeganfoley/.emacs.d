@@ -172,6 +172,8 @@ VALUE from 0 = transparent, 100 = opaque"
       (custom-theme-set-faces
        'sanityinc-solarized-light
        `(git-commit-summary ((t (:foreground ,"black"))))
+       `(ein:cell-input-area ((t (:foreground ,"black"))))
+       `(ein:cell-input-area ((t (:background ,"fdf6e3"))))
        )
 
       (custom-theme-set-faces
@@ -753,13 +755,22 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
     ;;(require 'poly-R)
     (require 'poly-markdown)))
 
+
+(use-package poly-markdown
+  :ensure t
+  :mode (
+	 ("\\.md" . poly-markdown-mode)
+  )
+)
+
 ;; I don't like how you can't really
 ;; move the cursor in this.
 ;;  I also changed it from ansi-term to term.
 ;; 
 ;;  eshell     - really weird input prompt (unicode or something)
 ;;  ansi-term  - no tab complete
-;;  term       - better than the other two, but can't move cursor and can't use M-x anything.  Also true of eshell. 
+;;  term       - better than the other two, but can't move cursor and can't use M-x anything.
+;;    Also true of eshell.
 ;; (defun ipython ()
 ;;   "Open an ipython shell."
 ;;   (interactive)
