@@ -740,11 +740,10 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
   :commands (poly-markdown+r-mode)
   :mode (("\\.rmd\\'" . poly-markdown+r-mode)
 	 ("\\.Rmd\\'" . poly-markdown+r-mode))
+
   :init
-  (progn
-    ;; I do not understand why this does not work.
-    ;;(require 'poly-R)
-    (require 'poly-markdown)))
+  (autoload 'r-mode "ess-site.el" "Major mode for editing R source." t)
+)
 
 
 (use-package poly-markdown
@@ -752,6 +751,10 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
   :mode (
 	 ("\\.md" . poly-markdown-mode)
   )
+)
+
+(use-package poly-R
+  :ensure t
 )
 
 ;; I don't like how you can't really
@@ -773,7 +776,7 @@ PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift o
   (setq python-shell-interpreter "ipython"))
 (setq python-shell-interpreter-args "--simple-prompt -i")
 ;;  Hooray!  This works!  At least for python2.
-;;  But since the error seemed related to ipython5, 
+;;  But since the error seemed related to ipython5,
 ;;  let's switch pyenv and check again.
 ;;  Works fine!  Just complains about grasp, pip can't find it.
 
