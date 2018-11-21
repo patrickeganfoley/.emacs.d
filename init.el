@@ -193,6 +193,27 @@ VALUE from 0 = transparent, 100 = opaque"
   :ensure t
   :config (progn (load-theme 'clues t t)))
 
+(use-package monokai-theme
+  :ensure t
+)
+
+(use-package spacemacs-theme
+  :ensure t
+  :init
+  (progn
+    (load-theme 'spacemacs-dark t)
+  )
+)
+
+
+(use-package spaceline
+  :ensure t
+  :init
+  (setq powerline-default-separator 'arrow-fade)
+  :config
+  (require 'spaceline-config)
+  (spaceline-spacemacs-theme))
+
 
 (use-package cycle-themes
   :ensure t
