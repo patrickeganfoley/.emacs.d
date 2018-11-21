@@ -655,7 +655,6 @@ Don't know what ARG does."
 (defun sql-presto ()
   "Connect to presto."
   (interactive)
-  ;; (my-sql-connect 'postgres 'presto)
   (let ((sql-product 'presto))
   (sql-connect 'presto)
   ))
@@ -670,12 +669,6 @@ We don't know what X is."
     (message "%S" options)
     (message "%S" x)
     (sql-comint product options)))
-
-(defun my-sql-connect (product connection)
-  "Connect to a sql product.
-PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift or presto)"
-  (setq sql-product product)
-  (sql-connect connection))
 
 (defun set-sql-buffer ()
   "Point to *SQL*."
