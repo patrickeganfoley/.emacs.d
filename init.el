@@ -671,14 +671,6 @@ We don't know what X is."
     (message "%S" x)
     (sql-comint product options)))
 
-
-
-
-(defun sql-redshift ()
-  "Connect to reshift.  Don't use this.  Redshift is over."
-  (interactive)
-  (my-sql-connect 'postgres 'redshift))
-
 (defun my-sql-connect (product connection)
   "Connect to a sql product.
 PRODUCT is like postgres, and CONNECTION should be predefined.  (like redshift or presto)"
