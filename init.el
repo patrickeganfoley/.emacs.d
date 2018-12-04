@@ -197,14 +197,11 @@ VALUE from 0 = transparent, 100 = opaque"
   :ensure t
 )
 
-(use-package spacemacs-theme
-  :ensure t
-  :init
-  (progn
+(use-package spacemacs-common
+  :ensure spacemacs-theme
+  :config
     (load-theme 'spacemacs-dark t)
-  )
 )
-
 
 (use-package spaceline
   :ensure t
@@ -223,7 +220,9 @@ VALUE from 0 = transparent, 100 = opaque"
   :init (setq cycle-themes-theme-list
 	      '(sanityinc-solarized-light
 		sanityinc-solarized-dark
-		monokai))
+		monokai
+		spacemacs-light
+		spacemacs-dark))
   :config (progn
 	    (cycle-themes-mode)
 	    (setq cycle-themes-mode-map
@@ -232,17 +231,6 @@ VALUE from 0 = transparent, 100 = opaque"
 	map))
 	    )
 )
-
-;; Dropped these themes
-;; sanityinc-tomorrow-day
-;; sanityinc-tomorrow-night
-;; sanityinc-tomorrow-eighties
-;; sanityinc-tomorrow-bright
-;; sanityinc-tomorrow-blue
-;; clues
-;; darcula
-;; danneskjold
-
 
 
 ;; Things I looked at and turned off
