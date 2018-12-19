@@ -46,7 +46,7 @@
 (scroll-bar-mode -1)
 (electric-indent-mode -1)
 
-(set-frame-font "Menlo 16")
+(set-frame-font "Menlo 24")
 
 
 ;;  Emacs Lisp Code
