@@ -643,9 +643,20 @@ Don't know what ARG does."
 (defun sql-presto ()
   "Connect to presto."
   (interactive)
-  (let ((sql-product 'presto))
-  (sql-connect 'presto)
-  ))
+  (let
+      ((sql-product 'presto))
+      (sql-connect 'presto)
+  )
+)
+
+(defun sql-hive ()
+  "Connect to the hive metastore."
+  (interactive)
+  (let
+      ((sql-product 'mysql))
+      (sql-connect 'hms)
+  )
+)
 
 
 (defun sql-comint-presto (product options x)
