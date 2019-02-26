@@ -451,9 +451,6 @@ Don't know what ARG does."
   :init (global-flycheck-mode)
   ;; Use C-c ! v to check out flycheck settings
   ;; Use C-c ! n to check the next error!
-  ;; :config (progn
-  ;;     (setq flycheck-emacs-lisp-checkdoc-executable "/Users/patrickfoley/checkdoc.el/checkdoc.el")
-  ;;    )
 )
 ;; Python has several syntax checkers,
 ;; pep8, pyflakes (flake8 includes both), pylint and pychecker
