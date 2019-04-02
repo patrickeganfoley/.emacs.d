@@ -30,7 +30,13 @@
 ;;  emacs-mac also has slightly different fullscreen support.
 ;;  https://github.com/joostkremers/writeroom-mode/issues/34
 ;;  You can get fullscren by calling M-x toggle-frame-fullscreen
-
+(defun set-frame-width-interactive (arg)
+  "Interactively set frame width.
+ARG
+Taken from https://stackoverflow.com/a/644950.
+Use like this:  `C-u 80 M-x set-frame-width-interactive`."
+   (interactive "p")
+   (set-frame-width (selected-frame) arg))
 
 
 
@@ -735,7 +741,12 @@ We don't know what X is."
   :init
   (autoload 'r-mode "ess-site.el" "Major mode for editing R source." t)
 )
-
+;;  You want to have monospace fonts
+;; within code blocks, but nice-looking
+;; markdown (variable pitch?) fonts
+;; in the markdown sections.
+;; Can you do this within set-face?
+;; Is pitch mode not within faces?
 
 (use-package poly-markdown
   :ensure t
@@ -773,7 +784,7 @@ We don't know what X is."
 
 
 ;;  EIN - Emacs IPython Notebook
-;;  Do not use the old repo maintained by tkf, 
+;;  Do not use the old repo maintained by tkf,
 ;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
 ;;  For some reason, ein:jupyter-server-start does not work
 ;;  It all works fine if I open the notebook server in an eshell.
@@ -783,7 +794,7 @@ We don't know what X is."
 (use-package ein
   :ensure t
   :commands (ein:notebooklist-open)
-  :config 
+  :config
   (defvar ein:jupyter-default-server-command)
   (defvar ein:jupyter-server-args)
   (setq ein:jupyter-default-server-command "/usr/local/bin/jupyter"
@@ -796,8 +807,10 @@ We don't know what X is."
 ;;  R / ESS 
  (use-package ess
    :ensure t
-   :mode (("\\.r\\'" . r-mode)
- 	 ("\\.R\\'" . r-mode))
+   :mode (
+	  ("\\.r\\'" . r-mode)
+ 	  ("\\.R\\'" . r-mode)
+	 )
 )
 ;; I cannot get ess-site to work with use-package.
 ;; I still haven't gotten it to work, but I'll 
