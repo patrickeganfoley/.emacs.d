@@ -1,3 +1,4 @@
+
 ;;; init.el --- P Foley emacs configs
 ;;; Commentary:
 
@@ -79,11 +80,20 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 )
 
 
+
+;;  Shell things
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
   :ensure t
   :config
   (exec-path-from-shell-initialize))
+;; Got this stuff from Mickey Peterson
+;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
+;; (setq explicit-shell-file-name "/bin/bash")
+(setq shell-file-name "bash")
+;; Is this necessary if I have exec-path-from-shell??
+(setenv "SHELL" shell-file-name)
+(setenv "ESHELL" shell-file-name)
 
 
 (use-package tramp
@@ -274,13 +284,16 @@ VALUE from 0 = transparent, 100 = opaque"
             (setq magit-push-arguments '("--set-upstream")))) ;aka -u
 
 
+
+;;  This does not work right now due to single sign on issues
 ;; (use-package magithub
 ;;   :ensure t
 ;;   :after magit
 ;;   :config
-;;   (magithub-feature-autoinject t)
-;;   (defvar magithub-clone-default-directory)
-;;   (setq magithub-clone-default-directory "~/"))
+;;     (magithub-feature-autoinject t)
+;;     (defvar magithub-clone-default-directory)
+;;     (setq magithub-clone-default-directory "~/")
+;;)
 
 ;; ido is 'interactively do' things
 ;; it powers smex but also lets you find files
@@ -651,6 +664,10 @@ Don't know what ARG does."
   ))
 
 
+;; To connect to a local db sqlite db:
+;; M-x sql-sqlite
+;; <name_of_db.db>
+
 (defun sql-comint-presto (product options x)
   "Interactive connection to presto.
 PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
@@ -731,12 +748,11 @@ We don't know what X is."
 ;;  Somehow now C-c C-y changes theme everywhere BUT orgmode
 ;;  and orgmode still uses C-c C-t for themes...
 
-
 (use-package polymode
   :ensure t
   :commands (poly-markdown+r-mode)
-  :mode (("\\.rmd\\'" . poly-markdown+r-mode)
-	 ("\\.Rmd\\'" . poly-markdown+r-mode))
+  ;; :mode (("\\.rmd\\'" . poly-markdown+r-mode)
+  ;; 	 ("\\.Rmd\\'" . poly-markdown+r-mode))
 
   :init
   (autoload 'r-mode "ess-site.el" "Major mode for editing R source." t)
@@ -751,13 +767,13 @@ We don't know what X is."
 (use-package poly-markdown
   :ensure t
   :mode (
-	 ("\\.md" . poly-markdown-mode)
-  )
+   	 ("\\.md\\'" . poly-markdown-mode)
+   )
 )
 
-(use-package poly-R
-  :ensure t
-)
+;; (use-package poly-R
+;;   :ensure t
+;; )
 
 ;; I don't like how you can't really
 ;; move the cursor in this.
@@ -804,16 +820,15 @@ We don't know what X is."
 
 
 
-;;  R / ESS 
- (use-package ess
-   :ensure t
-   :mode (
-	  ("\\.r\\'" . r-mode)
- 	  ("\\.R\\'" . r-mode)
-	 )
-)
+;;  R / ESS
+;; (use-package ess
+;;    :ensure t
+;;    :mode (
+;; 	  ("\\.r\\'" . r-mode)
+;;  	  ("\\.R\\'" . r-mode)
+;; 	 )
 ;; I cannot get ess-site to work with use-package.
-;; I still haven't gotten it to work, but I'll 
+;; I still haven't gotten it to work, but I'll
 ;; take notes here.
 ;;
 ;;  I manually installed ess and ess-R-object-popup
