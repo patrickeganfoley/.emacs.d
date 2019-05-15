@@ -1,4 +1,3 @@
-
 ;;; init.el --- P Foley emacs configs
 ;;; Commentary:
 
@@ -270,6 +269,19 @@ VALUE from 0 = transparent, 100 = opaque"
   :config ()
 )
 
+;; I don't really know what this is,
+;; but I think forge needs it.
+(use-package transient
+  :ensure t
+)
+
+(defvar ghub-use-workaround-for-emacs-bug)
+(setq ghub-use-workaround-for-emacs-bug nil)
+
+(use-package ghub
+  :ensure t
+)
+
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status))
@@ -285,15 +297,23 @@ VALUE from 0 = transparent, 100 = opaque"
 
 
 
-;;  This does not work right now due to single sign on issues
+;;  It works now!
+;; Go to github -> settings -> developer settings ->
+;;     personal access tokens
+;; Then find your magithub token and click 'Enable SSO'
 ;; (use-package magithub
-;;   :ensure t
-;;   :after magit
-;;   :config
-;;     (magithub-feature-autoinject t)
-;;     (defvar magithub-clone-default-directory)
-;;     (setq magithub-clone-default-directory "~/")
-;;)
+;;    :ensure t
+;;    :after magit
+;;    :config
+;;      (magithub-feature-autoinject t)
+;;      (defvar magithub-clone-default-directory)
+;;      (setq magithub-clone-default-directory "~/")
+;; )
+;; https://emacsair.me/2018/12/19/forge-0.1/
+(use-package forge
+  :ensure t
+  :after magit
+)
 
 ;; ido is 'interactively do' things
 ;; it powers smex but also lets you find files
@@ -662,6 +682,14 @@ Don't know what ARG does."
   (let ((sql-product 'presto))
   (sql-connect 'presto)
   ))
+
+(defun sql-rlyeh ()
+  "Connect to Rlyeh."
+  (interactive)
+  (let ((sql-product 'postgres))
+  (sql-connect 'rlyeh)
+  ))
+
 
 
 ;; To connect to a local db sqlite db:
