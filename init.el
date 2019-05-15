@@ -776,11 +776,15 @@ We don't know what X is."
 ;;  Somehow now C-c C-y changes theme everywhere BUT orgmode
 ;;  and orgmode still uses C-c C-t for themes...
 
+(use-package ess-site
+  :ensure t
+)
+
 (use-package polymode
   :ensure t
   :commands (poly-markdown+r-mode)
-  ;; :mode (("\\.rmd\\'" . poly-markdown+r-mode)
-  ;; 	 ("\\.Rmd\\'" . poly-markdown+r-mode))
+  :mode (("\\.rmd\\'" . poly-markdown+r-mode)
+   	 ("\\.Rmd\\'" . poly-markdown+r-mode))
 
   :init
   (autoload 'r-mode "ess-site.el" "Major mode for editing R source." t)
@@ -800,7 +804,7 @@ We don't know what X is."
 )
 
 ;; (use-package poly-R
-;;   :ensure t
+;;    :ensure t
 ;; )
 
 ;; I don't like how you can't really
