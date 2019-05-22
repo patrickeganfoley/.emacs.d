@@ -776,7 +776,7 @@ We don't know what X is."
 ;;  Somehow now C-c C-y changes theme everywhere BUT orgmode
 ;;  and orgmode still uses C-c C-t for themes...
 
-(use-package ess-site
+(use-package ess
   :ensure t
 )
 
@@ -960,6 +960,27 @@ Version 2015-07-30
 ;; (use-package slack
 ;;   :ensure t
 ;;   :init)
+
+(defun beautify-json ()
+  "Format region as json."
+  (interactive)
+  (let ((b (if mark-active (min (point) (mark)) (point-min)))
+        (e (if mark-active (max (point) (mark)) (point-max))))
+    (shell-command-on-region b e
+     "python -m json.tool" (current-buffer) t)))
+
+;; Want to be able to quickly look at json/events from presto
+;; pulled from https://stackoverflow.com/questions/435847/emacs-mode-to-edit-json
+(use-package json-mode
+  :ensure t
+  :mode (
+	 ("\\.json\\'" . json-mode)
+	)
+  :config (setq-default js-indent-level 4)
+)
+
+(global-set-key (kbd "C-c C-f") 'beautify-json)
+
 
 (provide 'init)
 ;;; init.el ends here
