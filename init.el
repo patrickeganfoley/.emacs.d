@@ -492,9 +492,13 @@ Don't know what ARG does."
   ;; Use C-c ! n to check the next error!
 )
 ;; Python has several syntax checkers,
-;; pep8, pyflakes (flake8 includes both), pylint and pychecker
-;; I don't know which I am using.  I have pep8 and pyflakes,
-;; so I think I'm using flake8.
+;; Let's try using pylint and _not_ flake8, just to have
+;; a single config file.
+;; Make a config file for a repo with pylint --generate-rcfile > .pylintrc
+;; For flake8, put things in setup.cfg with a [flake8] at the top of the file.
+;; You will also need to add a .dir_locals.el containing
+;; ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
+
 
 ;;  I want the linter to check for errors in
 ;; library usage too https://emacs.stackexchange.com/questions/13823/flycheck-check-python-module-import
