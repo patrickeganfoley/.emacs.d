@@ -215,8 +215,12 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package spacemacs-common
   :ensure spacemacs-theme
   :config
-    (load-theme 'spacemacs-dark t)
 )
+
+(use-package intellij-theme
+  :ensure t
+  :config (progn (load-theme 'intellij t t))
+  )
 
 (use-package spaceline
   :ensure t
@@ -237,7 +241,10 @@ VALUE from 0 = transparent, 100 = opaque"
 		sanityinc-solarized-dark
 		monokai
 		spacemacs-light
-		spacemacs-dark))
+		spacemacs-dark
+		intellij-theme
+		darcula-theme
+		))
   :config (progn
 	    (cycle-themes-mode)
 	    (setq cycle-themes-mode-map
@@ -503,6 +510,17 @@ Don't know what ARG does."
 ;;  I want the linter to check for errors in
 ;; library usage too https://emacs.stackexchange.com/questions/13823/flycheck-check-python-module-import
 ;; 
+
+(use-package blacken
+  :ensure t
+  :config
+  ;;(add-hook 'python-mode-hook 'blacken-mode)
+  )
+
+
+(use-package py-yapf
+  :ensure t
+  )
 
 
 (use-package flycheck-mypy
