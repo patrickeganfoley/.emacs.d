@@ -800,6 +800,11 @@ We don't know what X is."
 
 (use-package ess
   :ensure t
+  :mode (
+	 ("\\.r\\'" . r-mode)
+	 ("\\.R\\'" . r-mode)
+	 )
+  :init (require 'ess-r-mode)
 )
 
 (use-package polymode
@@ -807,16 +812,7 @@ We don't know what X is."
   :commands (poly-markdown+r-mode)
   :mode (("\\.rmd\\'" . poly-markdown+r-mode)
    	 ("\\.Rmd\\'" . poly-markdown+r-mode))
-
-  :init
-  (autoload 'r-mode "ess-site.el" "Major mode for editing R source." t)
 )
-;;  You want to have monospace fonts
-;; within code blocks, but nice-looking
-;; markdown (variable pitch?) fonts
-;; in the markdown sections.
-;; Can you do this within set-face?
-;; Is pitch mode not within faces?
 
 (use-package poly-markdown
   :ensure t
@@ -825,9 +821,9 @@ We don't know what X is."
    )
 )
 
-;; (use-package poly-R
-;;    :ensure t
-;; )
+(use-package poly-R
+    :ensure t
+)
 
 ;; I don't like how you can't really
 ;; move the cursor in this.
@@ -874,18 +870,6 @@ We don't know what X is."
 
 
 
-;;  R / ESS
-;; (use-package ess
-;;    :ensure t
-;;    :mode (
-;; 	  ("\\.r\\'" . r-mode)
-;;  	  ("\\.R\\'" . r-mode)
-;; 	 )
-;; I cannot get ess-site to work with use-package.
-;; I still haven't gotten it to work, but I'll
-;; take notes here.
-;;
-;;  I manually installed ess and ess-R-object-popup
 
 
 
