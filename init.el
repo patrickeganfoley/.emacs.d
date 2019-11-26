@@ -38,19 +38,17 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
    (interactive "p")
    (set-frame-width (selected-frame) arg))
 
-
-
-
 ;; * (interactive) means you can call a function with M-x
 ;;  <function-name>
-
-
 
 ;;; Code:
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (electric-indent-mode -1)
+
+;; Always make tabs into spaces
+(setq-default indent-tabs-mode nil)
 
 (set-frame-font "Menlo 24")
 
@@ -62,7 +60,7 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+	     '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives
 	     '("marmalade" . "http://marmalade-repo.org/packages/"))
 (package-initialize)
@@ -76,7 +74,7 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 
 (use-package google-this
   :ensure t
-)
+  )
 
 
 
@@ -113,14 +111,14 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
   :ensure t
   :bind (("C-c g g" . 'browse-at-remote))
   :config (progn
-	    (setq browse-url-browser-function 'osx-browse-url-safari))
-)
+	    (setq browse-url-browser-function 'osx-browse-url-safari)
+	    (setq browse-url-browser-function 'osx-browse-url-safari)
+	    (setq browse-url-browser-function 'osx-browse-url-safari)))
 
 
 ;; TeX
 (use-package latex-math-preview
-  :ensure t
-)
+  :ensure t)
 
 
 ;; Custom tries to put auto-generated code in your init.el
@@ -140,17 +138,17 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
   (interactive) ;; Do I need this for everything??
   (message "Reloading init.el...")
   (load-file "~/.emacs.d/init.el"))
-  
+
 ;; Trying to define a function.  I made these two
 ;; with Macros, but I have no idea what they mean.
 (fset 'quotify
-   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote (" \"\342\346 \"" 0 "%d")) arg)))
+      (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote (" \"\342\346 \"" 0 "%d")) arg)))
 (global-set-key (kbd "M-'") 'quotify)
 (global-set-key (kbd "M-\"") 'quotify)
 ;; Neat!  this worked!!
 
 (fset 'spacify
-   (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("  " 0 "%d")) arg)))
+      (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("  " 0 "%d")) arg)))
 (global-set-key (kbd "M-<SPC>") 'spacify)
 
 ;;  But really I should search for end of token (omitting \_),
@@ -184,14 +182,14 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config (progn (load-theme 'sanityinc-solarized-dark t t)
-                 (load-theme 'sanityinc-solarized-light t t)
+		 (load-theme 'sanityinc-solarized-light t t)
 		 )
-)
+  )
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config (progn (load-theme 'sanityinc-tomorrow-day t t)
-                 (load-theme 'sanityinc-tomorrow-night t t)
+		 (load-theme 'sanityinc-tomorrow-night t t)
 		 (load-theme 'sanityinc-tomorrow-blue t t)
 		 (load-theme 'sanityinc-tomorrow-bright t t)
 		 (load-theme 'sanityinc-tomorrow-eighties t t)))
@@ -210,12 +208,12 @@ VALUE from 0 = transparent, 100 = opaque"
 
 (use-package monokai-theme
   :ensure t
-)
+  )
 
 (use-package spacemacs-common
   :ensure spacemacs-theme
   :config
-)
+  )
 
 (use-package intellij-theme
   :ensure t
@@ -248,11 +246,11 @@ VALUE from 0 = transparent, 100 = opaque"
   :config (progn
 	    (cycle-themes-mode)
 	    (setq cycle-themes-mode-map
-      (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "C-c C-y") 'cycle-themes)
-	map))
+		  (let ((map (make-sparse-keymap)))
+		    (define-key map (kbd "C-c C-y") 'cycle-themes)
+		    map))
 	    )
-)
+  )
 
 
 ;; Things I looked at and turned off
@@ -266,41 +264,41 @@ VALUE from 0 = transparent, 100 = opaque"
   :init
   (progn
     (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
+    )
   )
-)
 
 
 
 (use-package multiple-cursors
   :ensure t
   :config ()
-)
+  )
 
 ;; I don't really know what this is,
 ;; but I think forge needs it.
 (use-package transient
   :ensure t
-)
+  )
 
 (defvar ghub-use-workaround-for-emacs-bug)
 (setq ghub-use-workaround-for-emacs-bug nil)
 
 (use-package ghub
   :ensure t
-)
+  )
 
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status))
   :config (progn
-            ;; The following two are critical for making magit 2.1.0 work more
-            ;; like 1.x for me: WITHOUT these, creating a new topic branch
-            ;; defaults its remote to master -- and pushing the topic branch
-            ;; pushes to master (?!?). WITH these, you're prompted on the
-            ;; first push, and need to supply origin/<topic-branch-name>, but
-            ;; thereafter it's set and all is well.
-            (setq magit-branch-arguments '()) ;do NOT want --track
-            (setq magit-push-arguments '("--set-upstream")))) ;aka -u
+	    ;; The following two are critical for making magit 2.1.0 work more
+	    ;; like 1.x for me: WITHOUT these, creating a new topic branch
+	    ;; defaults its remote to master -- and pushing the topic branch
+	    ;; pushes to master (?!?). WITH these, you're prompted on the
+	    ;; first push, and need to supply origin/<topic-branch-name>, but
+	    ;; thereafter it's set and all is well.
+	    (setq magit-branch-arguments '()) ;do NOT want --track
+	    (setq magit-push-arguments '("--set-upstream")))) ;aka -u
 
 
 
@@ -320,12 +318,12 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package forge
   :ensure t
   :after magit
-)
+  )
 
 ;; ido is 'interactively do' things
 ;; it powers smex but also lets you find files
 ;; anywhere.  same with buffers
-;;  I removed 	ido-everywhere t
+;;  I removed	ido-everywhere t
 ;;  b/c it breaks too many things.
 (use-package ido
   :ensure t
@@ -336,19 +334,19 @@ VALUE from 0 = transparent, 100 = opaque"
 	ido-use-filename-at-point nil
 	;; This one prevents in when finding a file
 	;; https://stackoverflow.com/a/18089076
-        ido-auto-merge-work-directories-length -1)
+	ido-auto-merge-work-directories-length -1)
   (ido-mode +1))
 
 
 ;; smex helps you quickly look up commands
 ;; C-s and C-r cycle commands, Enter executes selected command.
 (use-package smex
- :ensure t
- :init (smex-initialize)
- :bind ("M-x" . smex))
+  :ensure t
+  :init (smex-initialize)
+  :bind ("M-x" . smex))
 
 
-; Original idea from
+					; Original idea from
 ;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
 (defun comment-dwim-line (&optional arg)
   "Replacement for the `comment-dwim' command.
@@ -357,14 +355,14 @@ If no region is selected and current line is not blank and we are
   Replaces default behaviour of `comment-dwim', when it inserts
   comment at the end of the line.
   ARG is passed to `comment-normalize-vars'"
-    (interactive "*P")
-    (comment-normalize-vars)
-    (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
-        (comment-or-uncomment-region (line-beginning-position) (line-end-position))
-      (comment-dwim arg)))
+  (interactive "*P")
+  (comment-normalize-vars)
+  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+      (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+    (comment-dwim arg)))
 (global-set-key "\M-;" 'comment-dwim-line)
 
-                                                                     
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Full width comment box                                                 ;;
 ;; from http://irreal.org/blog/?p=374                                     ;;
@@ -375,15 +373,15 @@ Pulled from http://www.star.bris.ac.uk/bjm/emacs-tips.html.
 B is beginning of the box.
 E is the end."
 
-(interactive "r")
+  (interactive "r")
 
-(let ((e (copy-marker e t)))
-  (goto-char b)
-  (end-of-line)
-  (insert-char ?  (- fill-column (current-column)))
-  (comment-box b e 1)
-  (goto-char e)
-  (set-marker e nil)))
+  (let ((e (copy-marker e t)))
+    (goto-char b)
+    (end-of-line)
+    (insert-char ?  (- fill-column (current-column)))
+    (comment-box b e 1)
+    (goto-char e)
+    (set-marker e nil)))
 
 (global-set-key (kbd "C-c b b") 'bjm-comment-box)
 
@@ -395,9 +393,9 @@ E is the end."
 (global-set-key (kbd "C-x o") 'next-multiframe-window)
 
 ;; http://stackoverflow.com/a/17984479
- (defun prev-window ()
-   (interactive)
-   (other-window -1))
+(defun prev-window ()
+  (interactive)
+  (other-window -1))
 
 ;;(define-key global-map (kbd "C-x p") 'prev-window)
 (define-key global-map (kbd "C-x p") 'previous-multiframe-window)
@@ -408,13 +406,13 @@ E is the end."
   (if (> (length (window-list)) 2)
       (error "Can't toggle with more than 2 windows!")
     (let ((func (if (window-full-height-p)
-                    #'split-window-vertically
-                  #'split-window-horizontally)))
+		    #'split-window-vertically
+		  #'split-window-horizontally)))
       (delete-other-windows)
       (funcall func)
       (save-selected-window
-        (other-window 1)
-        (switch-to-buffer (other-buffer))))))
+	(other-window 1)
+	(switch-to-buffer (other-buffer))))))
 
 ;; From http://emacswiki.org/emacs/TransposeWindows
 ;; They also include this:
@@ -437,12 +435,12 @@ Don't know what ARG does."
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Narrowing.html
 ;; code from https://gist.github.com/mads-hartmann/3402786#gistcomment-693878
 (defun toggle-maximize-buffer () "Maximize buffer."
-  (interactive)
-  (if (= 1 (length (window-list)))
-      (jump-to-register '_)
-    (progn
-      (window-configuration-to-register '_)
-      (delete-other-windows))))
+       (interactive)
+       (if (= 1 (length (window-list)))
+	   (jump-to-register '_)
+	 (progn
+	   (window-configuration-to-register '_)
+	   (delete-other-windows))))
 ;;  Good tips on keybinding conventions
 ;; https://emacs.stackexchange.com/questions/42164/convention-about-using-c-x-or-c-c-as-prefix-keys
 (global-set-key (kbd "C-c z") 'toggle-maximize-buffer)
@@ -456,7 +454,7 @@ Don't know what ARG does."
 ;;  to install plugins for different languages just like
 ;;  you install different backends for syntax checking with
 ;;  flycheck.
-;; 
+;;
 ;;  It looks like 'helm' is also a big auto complete thing
 ;;
 ;;  Python has two major auto complete backends that work
@@ -473,9 +471,9 @@ Don't know what ARG does."
   (add-hook 'after-init-hook 'global-company-mode)
   (setq company-global-modes '(not eshell-mode shell-mode org-mode))
   ;;(progn
-   ;;  jedi breaks w/ pyenv.
-   ;;(use-package company-jedi
-   ;;   :ensure t)
+  ;;  jedi breaks w/ pyenv.
+  ;;(use-package company-jedi
+  ;;   :ensure t)
   ;;)
   ;; :bind
   ;; ("<tab>" . company-complete)
@@ -483,8 +481,8 @@ Don't know what ARG does."
   ;;:config
   ;; (defun my/python-mode-hook ()
   ;;  (add-to-list 'company-backends 'company-jedi))
-  ;(add-hook 'python-mode-hook 'my/python-mode-hook))
-)
+					;(add-hook 'python-mode-hook 'my/python-mode-hook))
+  )
 
 
 ;;  Syntax Checking
@@ -497,7 +495,7 @@ Don't know what ARG does."
   :init (global-flycheck-mode)
   ;; Use C-c ! v to check out flycheck settings
   ;; Use C-c ! n to check the next error!
-)
+  )
 ;; Python has several syntax checkers,
 ;; Let's try using pylint and _not_ flake8, just to have
 ;; a single config file.
@@ -509,7 +507,7 @@ Don't know what ARG does."
 
 ;;  I want the linter to check for errors in
 ;; library usage too https://emacs.stackexchange.com/questions/13823/flycheck-check-python-module-import
-;; 
+;;
 
 (use-package blacken
   :ensure t
@@ -526,10 +524,10 @@ Don't know what ARG does."
 (use-package flycheck-mypy
   :ensure t
   :config (progn
-      (setq flycheck-python-mypy-executable "mypy")
-      (setq flycheck-python-mypy-args "--py2")
-      )
-)
+	    (setq flycheck-python-mypy-executable "mypy")
+	    (setq flycheck-python-mypy-args "--py2")
+	    )
+  )
 
 ;;  I also installed sqlint with
 ;;  gem install sqlint
@@ -563,7 +561,7 @@ Don't know what ARG does."
   (setq flycheck-python-pycompile-executable "python3")
   (setq flycheck-python-pylint-executable "pylint3")
   (setq flycheck-python-flake8-executable "flake83")
-)
+  )
 
 (defun py2 ()
   "Tell flycheck to use python2."
@@ -571,7 +569,7 @@ Don't know what ARG does."
   (setq flycheck-python-pycompile-executable "python2")
   (setq flycheck-python-pylint-executable "pylint2")
   (setq flycheck-python-flake8-executable "flake82")
-)
+  )
 
 
 
@@ -644,16 +642,16 @@ Don't know what ARG does."
 ;;  don't need the redshift stuff or anything else other than
 ;;  `sane-presto` and the presto stuf.
 
-;;  
+;;
 (require 'sql)
 
 (use-package sql
   :ensure t
   :init (progn
 	  (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
-  ;; This is great!  You can sort sql results
-  ;; after they show up if you forgot to in the query!
-  ;; C-c ^ will sort!
+	  ;; This is great!  You can sort sql results
+	  ;; after they show up if you forgot to in the query!
+	  ;; C-c ^ will sort!
 	  )
   :hook
   (sql-mode . enable-sql-upcase)
@@ -662,7 +660,7 @@ Don't know what ARG does."
   :config
   (define-abbrev-table 'sql-mode-abbrev-table
     (mapcar #'(lambda (v) (list v (upcase v) nil 1))
-            '("absolute" "action" "add" "after" "all" "allocate" "alter" "and" "any" "are" "array" "as" "asc" "asensitive" "assertion" "asymmetric" "at" "atomic" "authorization" "avg" "before" "begin" "between" "bigint" "binary" "bit" "bitlength" "blob" "boolean" "both" "breadth" "by" "call" "called" "cascade" "cascaded" "case" "cast" "catalog" "char" "char_length" "character" "character_length" "check" "clob" "close" "coalesce" "collate" "collation" "column" "commit" "condition" "connect" "connection" "constraint" "constraints" "constructor" "contains" "continue" "convert" "corresponding" "count" "create" "cross" "cube" "current" "current_date" "current_default_transform_group" "current_path" "current_role" "current_time" "current_timestamp" "current_transform_group_for_type" "current_user" "cursor" "cycle" "data" "date" "day" "deallocate" "dec" "decimal" "declare" "default" "deferrable" "deferred" "delete" "depth" "deref" "desc" "describe" "descriptor" "deterministic" "diagnostics" "disconnect" "distinct" "do" "domain" "double" "drop" "dynamic" "each" "element" "else" "elseif" "end" "equals" "escape" "except" "exception" "exec" "execute" "exists" "exit" "external" "extract" "false" "fetch" "filter" "first" "float" "for" "foreign" "found" "free" "from" "full" "function" "general" "get" "global" "go" "goto" "grant" "group" "grouping" "handler" "having" "hold" "hour" "identity" "if" "immediate" "in" "indicator" "initially" "inner" "inout" "input" "insensitive" "insert" "int" "integer" "intersect" "interval" "into" "is" "isolation" "iterate" "join" "key" "language" "large" "last" "lateral" "leading" "leave" "left" "level" "like" "limit" "local" "localtime" "localtimestamp" "locator" "loop" "lower" "map" "match" "map" "member" "merge" "method" "min" "minute" "modifies" "module" "month" "multiset" "names" "national" "natural" "nchar" "nclob" "new" "next" "no" "none" "not" "null" "nullif" "numeric" "object" "octet_length" "of" "old" "on" "only" "open" "option" "or" "order" "ordinality" "out" "outer" "output" "over" "overlaps" "pad" "parameter" "partial" "partition" "path" "position" "precision" "prepare" "preserve" "primary" "prior" "privileges" "procedure" "public" "range" "read" "reads" "real" "recursive" "ref" "references" "referencing" "relative" "release" "repeat" "resignal" "restrict" "result" "return" "returns" "revoke" "right" "role" "rollback" "rollup" "routine" "row" "rows" "savepoint" "schema" "scope" "scroll" "search" "second" "section" "select" "sensitive" "session" "session_user" "set" "sets" "signal" "similar" "size" "smallint" "some" "space" "specific" "specifictype" "sql" "sqlcode" "sqlerror" "sqlexception" "sqlstate" "sqlwarning" "start" "state" "static" "submultiset" "substring" "sum" "symmetric" "system" "system_user" "table" "tablesample" "temporary" "then" "time" "timestamp" "timezone_hour" "timezone_minute" "to" "trailing" "transaction" "translate" "translation" "treat" "trigger" "trim" "true" "under" "undo" "union" "unique" "unknown" "unnest" "until" "update" "upper" "usage" "user" "using" "value" "values" "varchar" "varying" "view" "when" "whenever" "where" "while" "window" "with" "within" "without" "work" "write" "year" "zone" "greatest" "least")))
+	    '("absolute" "action" "add" "after" "all" "allocate" "alter" "and" "any" "are" "array" "as" "asc" "asensitive" "assertion" "asymmetric" "at" "atomic" "authorization" "avg" "before" "begin" "between" "bigint" "binary" "bit" "bitlength" "blob" "boolean" "both" "breadth" "by" "call" "called" "cascade" "cascaded" "case" "cast" "catalog" "char" "char_length" "character" "character_length" "check" "clob" "close" "coalesce" "collate" "collation" "column" "commit" "condition" "connect" "connection" "constraint" "constraints" "constructor" "contains" "continue" "convert" "corresponding" "count" "create" "cross" "cube" "current" "current_date" "current_default_transform_group" "current_path" "current_role" "current_time" "current_timestamp" "current_transform_group_for_type" "current_user" "cursor" "cycle" "data" "date" "day" "deallocate" "dec" "decimal" "declare" "default" "deferrable" "deferred" "delete" "depth" "deref" "desc" "describe" "descriptor" "deterministic" "diagnostics" "disconnect" "distinct" "do" "domain" "double" "drop" "dynamic" "each" "element" "else" "elseif" "end" "equals" "escape" "except" "exception" "exec" "execute" "exists" "exit" "external" "extract" "false" "fetch" "filter" "first" "float" "for" "foreign" "found" "free" "from" "full" "function" "general" "get" "global" "go" "goto" "grant" "group" "grouping" "handler" "having" "hold" "hour" "identity" "if" "immediate" "in" "indicator" "initially" "inner" "inout" "input" "insensitive" "insert" "int" "integer" "intersect" "interval" "into" "is" "isolation" "iterate" "join" "key" "language" "large" "last" "lateral" "leading" "leave" "left" "level" "like" "limit" "local" "localtime" "localtimestamp" "locator" "loop" "lower" "map" "match" "map" "member" "merge" "method" "min" "minute" "modifies" "module" "month" "multiset" "names" "national" "natural" "nchar" "nclob" "new" "next" "no" "none" "not" "null" "nullif" "numeric" "object" "octet_length" "of" "old" "on" "only" "open" "option" "or" "order" "ordinality" "out" "outer" "output" "over" "overlaps" "pad" "parameter" "partial" "partition" "path" "position" "precision" "prepare" "preserve" "primary" "prior" "privileges" "procedure" "public" "range" "read" "reads" "real" "recursive" "ref" "references" "referencing" "relative" "release" "repeat" "resignal" "restrict" "result" "return" "returns" "revoke" "right" "role" "rollback" "rollup" "routine" "row" "rows" "savepoint" "schema" "scope" "scroll" "search" "second" "section" "select" "sensitive" "session" "session_user" "set" "sets" "signal" "similar" "size" "smallint" "some" "space" "specific" "specifictype" "sql" "sqlcode" "sqlerror" "sqlexception" "sqlstate" "sqlwarning" "start" "state" "static" "submultiset" "substring" "sum" "symmetric" "system" "system_user" "table" "tablesample" "temporary" "then" "time" "timestamp" "timezone_hour" "timezone_minute" "to" "trailing" "transaction" "translate" "translation" "treat" "trigger" "trim" "true" "under" "undo" "union" "unique" "unknown" "unnest" "until" "update" "upper" "usage" "user" "using" "value" "values" "varchar" "varying" "view" "when" "whenever" "where" "while" "window" "with" "within" "without" "work" "write" "year" "zone" "greatest" "least")))
 
   (defun enable-sql-upcase ()
     (abbrev-mode 1)
@@ -674,8 +672,8 @@ Don't know what ARG does."
 
 
 (add-hook 'sql-interactive-mode-hook
-          (lambda ()
-            (toggle-truncate-lines t)))
+	  (lambda ()
+	    (toggle-truncate-lines t)))
 
 (defvar sql-postgres-program)
 (setq sql-postgres-program "/usr/local/bin/psql")
@@ -696,21 +694,21 @@ Don't know what ARG does."
 (defvar sql-presto-login-params)
 (setq sql-presto-program "sane-presto"
       sql-presto-login-params '((user :default "patrick")
-                                (database :default "")))
+				(database :default "")))
 
 (defun sql-presto ()
   "Connect to presto."
   (interactive)
   (let ((sql-product 'presto))
-  (sql-connect 'presto)
-  ))
+    (sql-connect 'presto)
+    ))
 
 (defun sql-rlyeh ()
   "Connect to Rlyeh."
   (interactive)
   (let ((sql-product 'postgres))
-  (sql-connect 'rlyeh)
-  ))
+    (sql-connect 'rlyeh)
+    ))
 
 
 
@@ -730,9 +728,9 @@ We don't know what X is."
 
 (defun set-sql-buffer ()
   "Point to *SQL*."
-  ; (interactive "b")
-  ;  We can probably provide a default arg.
-  ;  Should figure out how soon.
+					; (interactive "b")
+					;  We can probably provide a default arg.
+					;  Should figure out how soon.
   (interactive)
   (setq sql-buffer "*SQL*"))
 
@@ -748,14 +746,14 @@ We don't know what X is."
 ;;  See https://emacs.stackexchange.com/questions/21245/dealing-with-warning-assignment-to-free-variable-when-certain-libraries-can-b for why it' necessary.
 (defvar buffer-face-mode-face)
 (defun variable-font-buffer ()
-   "Set font to a variable width (proportional) fonts in current buffer.  Taken from https://emacs.stackexchange.com/a/3044."
-   (interactive)
-   (setq buffer-face-mode-face '(
-	 :family "Times New Roman"
-         :height 200
-        ))
-   (buffer-face-mode)
-)
+  "Set font to a variable width (proportional) fonts in current buffer.  Taken from https://emacs.stackexchange.com/a/3044."
+  (interactive)
+  (setq buffer-face-mode-face '(
+				:family "Times New Roman"
+				:height 200
+				))
+  (buffer-face-mode)
+  )
 
 
 (use-package markdown-mode
@@ -772,7 +770,7 @@ We don't know what X is."
 	  (add-hook 'markdown-mode-hook 'variable-font-buffer)
 	  (add-hook 'gfm-mode-hook 'variable-font-buffer)
 	  )
-)
+  )
 
 
 (use-package vmd-mode
@@ -781,7 +779,7 @@ We don't know what X is."
 	  ;; (add-hook 'markdown-mode-hook 'vmd-mode)
 	  ;; (global-set-key (kbd "M-m p") 'vmd-mode)
 	  )
-)
+  )
 
 ;;  Org Mode stuff org-mode org .org orgmode
 ;;  Don't use use-package, it's already in
@@ -790,7 +788,7 @@ We don't know what X is."
 ;;  cycle-themes took C-c C-t...
 (eval-after-load 'org-mode
   '(define-key org-mode-map (kbd "C-c C-t") 'org-todo)
-)
+  )
 ;; ... why do I need to do this???
 ;; It doesn't even work....
 (global-set-key (kbd "C-c C-t") 'org-todo)
@@ -805,30 +803,30 @@ We don't know what X is."
 	 ("\\.R\\'" . r-mode)
 	 )
   :init (require 'ess-r-mode)
-)
+  )
 
 (use-package polymode
   :ensure t
   :commands (poly-markdown+r-mode)
   :mode (("\\.rmd\\'" . poly-markdown+r-mode)
-   	 ("\\.Rmd\\'" . poly-markdown+r-mode))
-)
+	 ("\\.Rmd\\'" . poly-markdown+r-mode))
+  )
 
 (use-package poly-markdown
   :ensure t
   :mode (
-   	 ("\\.md\\'" . poly-markdown-mode)
-   )
-)
+	 ("\\.md\\'" . poly-markdown-mode)
+	 )
+  )
 
 (use-package poly-R
-    :ensure t
-)
+  :ensure t
+  )
 
 ;; I don't like how you can't really
 ;; move the cursor in this.
 ;;  I also changed it from ansi-term to term.
-;; 
+;;
 ;;  eshell     - really weird input prompt (unicode or something)
 ;;  ansi-term  - no tab complete
 ;;  term       - better than the other two, but can't move cursor and can't use M-x anything.
@@ -864,21 +862,12 @@ We don't know what X is."
   (defvar ein:jupyter-default-server-command)
   (defvar ein:jupyter-server-args)
   (setq ein:jupyter-default-server-command "/usr/local/bin/jupyter"
-        ein:jupyter-server-args (list "--no-browser")
-  )
-)
-
-
-
-
-
-
+	ein:jupyter-server-args (list "--no-browser")))
 
 ;;  Does this have to come after rmode?
 (use-package restclient
   :ensure t
-  :mode (("\\.restclient\\'" . restclient-mode))
-)
+  :mode (("\\.restclient\\'" . restclient-mode)))
 
 
 
@@ -888,34 +877,31 @@ We don't know what X is."
   :ensure t
   :mode "\\.yaml\\'"
   :mode "\\.portal\\'"
-  :mode "\\.portal_monitoring\\'"
-  )
+  :mode "\\.portal_monitoring\\'")
 
 
 (use-package projectile
   ;; NOTE - you use this mostly for C-c p s g and C-c p r
   ;; but using M-s . is also really nice!!
   ;; https://stackoverflow.com/a/1775184
-  ;; 
+  ;;
   ;; http://batsov.com/projectile/
   ;; projectile highly recommends the fix-ido package.
   ;; Maybe I should use it.
   ;; Useful Commands:
-  ;;    C-c p s g  Run grep on the files in the project.    
-  ;;    C-c p b  Display a list of all project buffers currently open (for current project).    
-  ;;    C-c p p  Display a list of known projects you can switch to.    
-  ;;    C-c p r  Runs interactive query-replace on all files in the projects.    
-  ;;    C-c p s s  Runs ag on the project. Requires the presence of ag.el.    
-  ;;    (This is recommended instead of projectile isearch) 
+  ;;    C-c p s g  Run grep on the files in the project.
+  ;;    C-c p b  Display a list of all project buffers currently open (for current project).
+  ;;    C-c p p  Display a list of known projects you can switch to.
+  ;;    C-c p r  Runs interactive query-replace on all files in the projects.
+  ;;    C-c p s s  Runs ag on the project. Requires the presence of ag.el.
+  ;;    (This is recommended instead of projectile isearch)
   ;;    C-c p C-h (shows all projectile bindings)
   :ensure t
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :config (progn
-	   (setq projectile-enable-caching t)
-	   (setq projectile-switch-project-action 'projectile-dired)
-	   )
-)
+	    (setq projectile-enable-caching t)
+	    (setq projectile-switch-project-action 'projectile-dired)))
 
 
 
@@ -939,28 +925,25 @@ Version 2015-07-30
      ((equal $sort-by "name") (setq $arg "-alh"))
      ((equal $sort-by "date") (setq $arg "-alt"))
      ((equal $sort-by "size") (setq $arg "-alhS"))
-     (t (error "Logic error 09535" )))
-    (dired-sort-other $arg ))
-)
+     (t(error "Logic error 09535")))
+    (dired-sort-other $arg)))
 
-(eval-after-load "dired" '(progn
-  (define-key dired-mode-map (kbd "s") 'xah-dired-sort) ))
+(eval-after-load "dired"
+  '(progn (define-key dired-mode-map (kbd "s") 'xah-dired-sort)))
 
 (load-theme 'sanityinc-solarized-light t)
 
 (message "Setting custom faces for solarized light")
 (custom-theme-set-faces
-    'sanityinc-solarized-light
-        `(git-commit-summary ((t (:foreground ,"black"))))
-        `(ein:cell-input-area ((t (:foreground ,"black"))))
-        `(ein:cell-input-area ((t (:background ,"fdf6e3"))))
-)
+ 'sanityinc-solarized-light
+ `(git-commit-summary ((t (:foreground ,"black"))))
+ `(ein:cell-input-area ((t (:foreground ,"black"))))
+ `(ein:cell-input-area ((t (:background ,"fdf6e3")))))
 
 (message "Setting custom faces for solarized dark")
 (custom-theme-set-faces
-    'sanityinc-solarized-dark
-        `(git-commit-summary ((t (:foreground ,"black"))))
- )
+ 'sanityinc-solarized-dark
+ `(git-commit-summary ((t (:foreground ,"black")))))
 
 ;; Slack
 ;; (use-package slack
@@ -971,19 +954,16 @@ Version 2015-07-30
   "Format region as json."
   (interactive)
   (let ((b (if mark-active (min (point) (mark)) (point-min)))
-        (e (if mark-active (max (point) (mark)) (point-max))))
+	(e (if mark-active (max (point) (mark)) (point-max))))
     (shell-command-on-region b e
-     "python -m json.tool" (current-buffer) t)))
+			     "python -m json.tool" (current-buffer) t)))
 
 ;; Want to be able to quickly look at json/events from presto
 ;; pulled from https://stackoverflow.com/questions/435847/emacs-mode-to-edit-json
 (use-package json-mode
   :ensure t
-  :mode (
-	 ("\\.json\\'" . json-mode)
-	)
-  :config (setq-default js-indent-level 4)
-)
+  :mode (("\\.json\\'" . json-mode))
+  :config (setq-default js-indent-level 4))
 
 (global-set-key (kbd "C-c C-f") 'beautify-json)
 
