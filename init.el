@@ -120,6 +120,12 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (use-package latex-math-preview
   :ensure t)
 
+;; (use-package tex
+;;   :defer t
+;;   :ensure auctex
+;;   :config
+;;   (setq TeX-auto-save t))
+
 
 ;; Custom tries to put auto-generated code in your init.el
 ;; This will prevent that.
@@ -194,18 +200,6 @@ VALUE from 0 = transparent, 100 = opaque"
 		 (load-theme 'sanityinc-tomorrow-bright t t)
 		 (load-theme 'sanityinc-tomorrow-eighties t t)))
 
-(use-package danneskjold-theme
-  :ensure t
-  :config (progn (load-theme 'danneskjold t t)))
-
-(use-package darcula-theme
-  :ensure t
-  :config (progn (load-theme 'darcula t t)))
-
-(use-package clues-theme
-  :ensure t
-  :config (progn (load-theme 'clues t t)))
-
 (use-package monokai-theme
   :ensure t
   )
@@ -213,11 +207,6 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package spacemacs-common
   :ensure spacemacs-theme
   :config
-  )
-
-(use-package intellij-theme
-  :ensure t
-  :config (progn (load-theme 'intellij t t))
   )
 
 (use-package spaceline
@@ -228,20 +217,41 @@ VALUE from 0 = transparent, 100 = opaque"
   (require 'spaceline-config)
   (spaceline-spacemacs-theme))
 
+;; (use-package zenburn-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'zenburn t))
+
+;; (use-package doom-themes
+;;   :config
+;;   ;; Global settings (defaults)
+;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;   (load-theme 'doom-one t)
+
+;;   ;; Enable flashing mode-line on errors
+;;   (doom-themes-visual-bell-config)
+  
+;;   ;; Enable custom neotree theme (all-the-icons must be installed!)
+;;   ;; (doom-themes-neotree-config)
+;;   ;; or for treemacs users
+;;   ;; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+;;   ;; (doom-themes-treemacs-config)
+  
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
 
 (use-package cycle-themes
   :ensure t
   ;;  I can't unbind C-c C-t from cycle-themes
   ;;  no matter how hard I try.  ) :
+  ;;  This is also annoying for ein/jupyter.  Uses c-t for toggling cells.
   :bind (("C-c C-y" . cycle-themes))
   :init (setq cycle-themes-theme-list
 	      '(sanityinc-solarized-light
 		sanityinc-solarized-dark
 		monokai
-		spacemacs-light
-		spacemacs-dark
-		intellij-theme
-		darcula-theme
+                ;; zenburn
 		))
   :config (progn
 	    (cycle-themes-mode)
@@ -490,6 +500,12 @@ Don't know what ARG does."
 ;;    *  flymake is the built-in version of syntax checking.
 ;;    *  flycheck does not check syntax itself, but calls
 ;;       external programs you need to install.
+
+;; You didn't get it working, but this
+;; https://emacs.stackexchange.com/a/14549
+;; should help with checking external libraries w/ flycheck.
+
+
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode)
@@ -503,6 +519,7 @@ Don't know what ARG does."
 ;; For flake8, put things in setup.cfg with a [flake8] at the top of the file.
 ;; You will also need to add a .dir_locals.el containing
 ;; ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
+;; You can also run this https://emacs.stackexchange.com/a/41679...  but that doesn't work.
 
 
 ;;  I want the linter to check for errors in
@@ -847,6 +864,27 @@ We don't know what X is."
 ;;  Works fine!  Just complains about grasp, pip can't find it.
 
 
+;; Python
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
+  ;;  https://stackoverflow.com/a/45223877/1965477
+(add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
+
+
+;; taken from http://rakan.me/emacs/python-dev-with-emacs-and-pyenv/
+;; trying to follow https://smythp.com/emacs/python/2016/04/27/pyenv-elpy.html
+;; (use-package pyenv-mode
+;;   :init
+;;   (add-to-list 'exec-path "~/.pyenv/shims")
+;;   (setenv "WORKON_HOME" "~/.pyenv/versions/")
+;;   :config
+;;   (pyenv-mode)
+;;   :bind
+;;   ("C-x p e" . pyenv-activate-current-project))
+
+
 ;;  EIN - Emacs IPython Notebook
 ;;  Do not use the old repo maintained by tkf,
 ;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
@@ -854,7 +892,9 @@ We don't know what X is."
 ;;  It all works fine if I open the notebook server in an eshell.
 ;; See https://github.com/millejoh/emacs-ipython-notebook/issues/176#issuecomment-299512815
 ;; for issues with being unable to log in.
-;;  This does not work if you
+;;  Ein Notes:
+;;    run ein:notebooklist-login, use the password
+;;    
 (use-package ein
   :ensure t
   :commands (ein:notebooklist-open)
@@ -967,6 +1007,14 @@ Version 2015-07-30
 
 (global-set-key (kbd "C-c C-f") 'beautify-json)
 
+
+;; https://www.emacswiki.org/emacs/IncrementNumber
+ (defun increment-number-at-point ()
+      (interactive)
+      (skip-chars-backward "0-9")
+      (or (looking-at "[0-9]+")
+          (error "No number at point"))
+      (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
 
 (provide 'init)
 ;;; init.el ends here
