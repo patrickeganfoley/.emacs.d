@@ -246,6 +246,8 @@ VALUE from 0 = transparent, 100 = opaque"
   ;;  I can't unbind C-c C-t from cycle-themes
   ;;  no matter how hard I try.  ) :
   ;;  This is also annoying for ein/jupyter.  Uses c-t for toggling cells.
+  ;;  You should fork it and install following  https://github.com/raxod502/straight.el#integration-with-use-package
+  ;; your issue is https://github.com/toroidal-code/cycle-themes.el/issues/3
   :bind (("C-c C-y" . cycle-themes))
   :init (setq cycle-themes-theme-list
 	      '(sanityinc-solarized-light
@@ -720,6 +722,12 @@ Don't know what ARG does."
     (sql-connect 'presto)
     ))
 
+
+(defvar sql-glitter-program)
+;; (defvar sql-glitter-login-params)
+(setq sql-glitter-program "glitter")
+
+
 (defun sql-rlyeh ()
   "Connect to Rlyeh."
   (interactive)
@@ -802,16 +810,57 @@ We don't know what X is."
 ;;  Don't use use-package, it's already in
 ;;  vanilla emacs.
 (require 'ox-md nil t)
+
 ;;  cycle-themes took C-c C-t...
+;;  I need to change cycle-themes.
 (eval-after-load 'org-mode
   '(define-key org-mode-map (kbd "C-c C-t") 'org-todo)
   )
-;; ... why do I need to do this???
-;; It doesn't even work....
+
 (global-set-key (kbd "C-c C-t") 'org-todo)
-;;  ...  now it's even more broken.
-;;  Somehow now C-c C-y changes theme everywhere BUT orgmode
-;;  and orgmode still uses C-c C-t for themes...
+
+;; (setq org-todo-keywords ((sequence "TODO" "BACKLOG" "DONE")))
+
+(setq org-hide-emphasis-markers t)
+(font-lock-add-keywords 'org-mode
+                        '(("^ *\\([-]\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  (custom-theme-set-faces
+   'user
+   '(variable-pitch ((t (:family "ETBembo" :height 180 ))))
+   '(fixed-pitch ((t ( :family "Fira Code Retina" :height 160)))))
+
+  (add-hook 'org-mode-hook 'variable-pitch-mode)
+  (add-hook 'org-mode-hook 'visual-line-mode)
+
+ (let* ((variable-tuple
+          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
+                ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+                ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+                ((x-list-fonts "Verdana")         '(:font "Verdana"))
+                ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+                (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+         (base-font-color     (face-foreground 'default nil 'default))
+         (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+    (custom-theme-set-faces
+     'user
+     `(org-level-8 ((t (,@headline ,@variable-tuple))))
+     `(org-level-7 ((t (,@headline ,@variable-tuple))))
+     `(org-level-6 ((t (,@headline ,@variable-tuple))))
+     `(org-level-5 ((t (,@headline ,@variable-tuple))))
+     `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+     `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+     `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+     `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+     `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (use-package ess
   :ensure t
@@ -871,6 +920,10 @@ We don't know what X is."
   (elpy-enable))
   ;;  https://stackoverflow.com/a/45223877/1965477
 (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
+;; You might want to add this
+(setq elpy-eldoc-show-current-function nil)
+;; https://github.com/jorgenschaefer/elpy/issues/1381
+;; Do that if you keep seeing the string awfulness
 
 
 ;; taken from http://rakan.me/emacs/python-dev-with-emacs-and-pyenv/
