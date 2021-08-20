@@ -1,31 +1,9 @@
 ;;; init.el --- P Foley emacs configs
 ;;; Commentary:
 
-;;  rebuilding with [these instructions](https://news.ycombinator.com/item?id=9595396)
-;;  I want svg support for eww.
-;;  That worked.  But you need a few changes:
-;;  This version is at /usr/local/Cellar/emacs-mac/emacs-26.1-z-mac-7.2/Emacs.app/Contents/MacOS/Emacs
-;;  You'll want to set up an alias.
-;;  I set up an alias to `memacs` rather than `emacs` because I couldn't
-;;  delete the Emacs in /usr/bin/local.  It's restricted by OSX.
-;;  I could probably get around that w/ the CMD-R + csrutil disable thing,
-;;  but I don't want to attempt until I upgrade to mojave.
+;;  rebuilt with [these instructions](https://news.ycombinator.com/item?id=9595396)
 (setq mac-command-modifier 'meta ;; I want this to do nothing.
-      ;;  TODO: Change command to be command.
       mac-option-modifier 'meta)
-;;  Your options here are
-;;    * control  (standard C-x)
-;;    * meta     (standard M-x)
-;;    * alt      ????
-;;    * hyper    no major/minor modes use these - so do whatever you want
-;;    * super    no major/minor modes use these - so do whatever you want
-;;  Let me look up what it is in the other emacs.
-;;  Other emacs says
-;; mac-command-modifier is a variable defined in ‘ns-win.el’.
-;; Its value is ‘meta’
-;;   This variable is an alias for ‘ns-command-modifier’.
-;;  So this is probably only defined in emacs-mac.
-
 
 ;;  emacs-mac also has slightly different fullscreen support.
 ;;  https://github.com/joostkremers/writeroom-mode/issues/34
@@ -37,9 +15,6 @@ Taken from https://stackoverflow.com/a/644950.
 Use like this:  `C-u 80 M-x set-frame-width-interactive`."
    (interactive "p")
    (set-frame-width (selected-frame) arg))
-
-;; * (interactive) means you can call a function with M-x
-;;  <function-name>
 
 ;;; Code:
 (tool-bar-mode -1)
@@ -120,23 +95,11 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (use-package latex-math-preview
   :ensure t)
 
-;; (use-package tex
-;;   :defer t
-;;   :ensure auctex
-;;   :config
-;;   (setq TeX-auto-save t))
-
-
 ;; Custom tries to put auto-generated code in your init.el
 ;; This will prevent that.
 ;; https://emacs.stackexchange.com/a/29746
 (setq custom-file "~/.emacs.d/custom.el")
 (load-file custom-file)
-
-;; emacs is too slow in eshell when printing job logs
-;; https://stackoverflow.com/questions/26985772/fast-emacs-shell-mode
-;; comint-move-point-for-output and comint-scroll-show-maximum-output to  nil
-
 
 ;; This is me trying to learn lisp
 (defun load-init ()
@@ -147,6 +110,9 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 
 ;; Trying to define a function.  I made these two
 ;; with Macros, but I have no idea what they mean.
+;; I'd like to change this so it
+;;   1.  Will use single if I put single, double if double
+;;   2.  Is toggle-able or can be undone with a similar function
 (fset 'quotify
       (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote (" \"\342\346 \"" 0 "%d")) arg)))
 (global-set-key (kbd "M-'") 'quotify)
@@ -157,15 +123,6 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
       (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("  " 0 "%d")) arg)))
 (global-set-key (kbd "M-<SPC>") 'spacify)
 
-;;  But really I should search for end of token (omitting \_),
-;;  not for spaces.
-
-
-;; TODO - get the shackles package,
-;; I think it forces buffers to open in
-;; the window you open them
-
-
 ;;  Appearance
 (defun transparency (value)
   "Set the transparency of the frame window.
@@ -174,17 +131,7 @@ VALUE from 0 = transparent, 100 = opaque"
   (set-frame-parameter (selected-frame) 'alpha value))
 
 
-
-;; I want to change how the themes look in some places.
-;;  It looks like themes have 'faces' and I should
-;;  be able to change them with custom-them-set-face
-;;  for examples / magit face names, see
-;;  https://github.com/bbatsov/solarized-emacs/blob/master/solarized.el#L1400
-;;  Going to try this https://emacs.stackexchange.com/a/17962
-;;  Use list-faces-display to see all faces shown anywhere
-;;  Use M-x describe-face to see the face at cursor
-;;  I'm still struggling to get some faces overwritten.
-;;  I've now put it at the end of the init.el
+;; Themes
 (use-package color-theme-sanityinc-solarized
   :ensure t
   :config (progn (load-theme 'sanityinc-solarized-dark t t)
@@ -217,30 +164,6 @@ VALUE from 0 = transparent, 100 = opaque"
   (require 'spaceline-config)
   (spaceline-spacemacs-theme))
 
-;; (use-package zenburn-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'zenburn t))
-
-;; (use-package doom-themes
-;;   :config
-;;   ;; Global settings (defaults)
-;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-one t)
-
-;;   ;; Enable flashing mode-line on errors
-;;   (doom-themes-visual-bell-config)
-  
-;;   ;; Enable custom neotree theme (all-the-icons must be installed!)
-;;   ;; (doom-themes-neotree-config)
-;;   ;; or for treemacs users
-;;   ;; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-;;   ;; (doom-themes-treemacs-config)
-  
-;;   ;; Corrects (and improves) org-mode's native fontification.
-;;   (doom-themes-org-config))
-
 (use-package cycle-themes
   :ensure t
   ;;  I can't unbind C-c C-t from cycle-themes
@@ -267,6 +190,7 @@ VALUE from 0 = transparent, 100 = opaque"
 
 ;; Things I looked at and turned off
 ;;   *  smart-parens
+;;   *  a ton of orgmode things (e.g. special unicode bullets)
 
 
 (use-package rainbow-delimiters
@@ -278,7 +202,6 @@ VALUE from 0 = transparent, 100 = opaque"
     (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
     )
   )
-
 
 
 (use-package multiple-cursors
@@ -313,19 +236,6 @@ VALUE from 0 = transparent, 100 = opaque"
 	    (setq magit-push-arguments '("--set-upstream")))) ;aka -u
 
 
-
-;;  It works now!
-;; Go to github -> settings -> developer settings ->
-;;     personal access tokens
-;; Then find your magithub token and click 'Enable SSO'
-;; (use-package magithub
-;;    :ensure t
-;;    :after magit
-;;    :config
-;;      (magithub-feature-autoinject t)
-;;      (defvar magithub-clone-default-directory)
-;;      (setq magithub-clone-default-directory "~/")
-;; )
 ;; https://emacsair.me/2018/12/19/forge-0.1/
 (use-package forge
   :ensure t
@@ -393,8 +303,8 @@ E is the end."
     (insert-char ?  (- fill-column (current-column)))
     (comment-box b e 1)
     (goto-char e)
-    (set-marker e nil)))
-
+    (set-marker e nil))
+)
 (global-set-key (kbd "C-c b b") 'bjm-comment-box)
 
 
@@ -502,12 +412,6 @@ Don't know what ARG does."
 ;;    *  flymake is the built-in version of syntax checking.
 ;;    *  flycheck does not check syntax itself, but calls
 ;;       external programs you need to install.
-
-;; You didn't get it working, but this
-;; https://emacs.stackexchange.com/a/14549
-;; should help with checking external libraries w/ flycheck.
-
-
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode)
@@ -515,18 +419,12 @@ Don't know what ARG does."
   ;; Use C-c ! n to check the next error!
   )
 ;; Python has several syntax checkers,
-;; Let's try using pylint and _not_ flake8, just to have
-;; a single config file.
-;; Make a config file for a repo with pylint --generate-rcfile > .pylintrc
-;; For flake8, put things in setup.cfg with a [flake8] at the top of the file.
-;; You will also need to add a .dir_locals.el containing
-;; ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
-;; You can also run this https://emacs.stackexchange.com/a/41679...  but that doesn't work.
-
-
-;;  I want the linter to check for errors in
-;; library usage too https://emacs.stackexchange.com/questions/13823/flycheck-check-python-module-import
-;;
+;;   *  pylint and flake8 are the main ones, and mypy does static type checking.
+;;   *  You can make a config file for a repo with pylint --generate-rcfile > .pylintrc
+;;   *  For flake8, put things in setup.cfg with a [flake8] at the top of the file.
+;;      You will also need to add a .dir_locals.el containing
+;;      ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
+;;   * My main issue right now is I don't get type checks / they're often incorrect.  I think mypy ought to solve this, but I'm holding off on that until I fix the whole python situation using pyls.
 
 (use-package blacken
   :ensure t
@@ -540,46 +438,18 @@ Don't know what ARG does."
   )
 
 
-(use-package flycheck-mypy
-  :ensure t
-  :config (progn
-	    (setq flycheck-python-mypy-executable "mypy")
-	    (setq flycheck-python-mypy-args "--py2")
-	    )
-  )
+;;  flycheck uses https://github.com/jimhester/lintr for R
 
-;;  I also installed sqlint with
-;;  gem install sqlint
-;;  https://github.com/purcell/sqlint
-;;  But I'll bet it defaults to postgres and I'd like
-;;  to find a hivesql checker
-;;  other than https://sql.treasuredata.com
-;;  This is another option for psql https://github.com/markdrago/pgsanity
-;;  The only things I could find for hive are
-;;  https://github.com/mayanhui/Hive-SQL-Syntax-Checker and an
-;;  inactive fork that are 5 and 3 years old.
-
-;;  Auto-pep8
-;;  yapf is yet another python formatter, maintained
-;;  by google.
-;;  To edit defaults, go to ~/.config/yapf/style
-(use-package py-yapf
-  :ensure t)
-
-
-;; flycheck uses https://github.com/jimhester/lintr
-
-;;  Syntax checking for python3
 
 ;; (setq pythons-list
 ;;      '("python2" "python3"))
-;;  You don't need this anymore!  Pyenv takes care of it for you!
+;;  TODO: change this so it takes a venv as an arg.
 (defun py3 ()
   "Tell flycheck to use python3."
   (interactive)
-  (setq flycheck-python-pycompile-executable "python3")
-  (setq flycheck-python-pylint-executable "pylint3")
-  (setq flycheck-python-flake8-executable "flake83")
+  ;;(setq flycheck-python-pycompile-executable "python3")
+  (setq flycheck-python-pylint-executable "/Users/patrickfoley/venvs/396/bin/pylint")
+  (setq flycheck-python-flake8-executable "/Users/patrickfoley/venvs/396/bin/flake83")
   )
 
 (defun py2 ()
@@ -590,17 +460,13 @@ Don't know what ARG does."
   (setq flycheck-python-flake8-executable "flake82")
   )
 
-
-
-;; Scala stuff (for reading Uhura)
+;; Scala
 (use-package scala-mode
   :ensure t
   :interpreter
   ("scala" . scala-mode))
 
-;; Golang stuff (might not work.)
-;; For flotilla-os and a bunch of other
-;; platform stuff
+;; Golang
 (use-package go-mode
   :ensure t
   :init
@@ -612,10 +478,8 @@ Don't know what ARG does."
   (add-hook 'go-mode-hook 'electric-pair-mode))
 
 
-
-
 ;; Copy-Paste
-;; This let's me copy and paste w/ the system.
+;; This let's me copy and paste w/ OSX
 (setq select-enable-clipboard t)
 
 (defun copy-to-clipboard ()
@@ -649,21 +513,13 @@ Don't know what ARG does."
 
 ;;  SQL stuff This is mostly copy pasted from
 ;;  https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client
-;;  You may not need most of this.  You probably don't need psql, you
+;;  https://www.emacswiki.org/emacs?action=browse;oldid=Gmail%2c_Gnus_and_GPG_on_a_Mac;id=Gmail%2c_Gnus_and_GPG#toc11
 
-;; encrypt some passwords?
-;; #https://www.emacswiki.org/emacs?action=browse;oldid=Gmail%2c_Gnus_and_GPG_on_a_Mac;id=Gmail%2c_Gnus_and_GPG#toc11
-;; This stuff doesn't work.  /shrug.
-;;  I couldn't get my gnugpg stuff to work, so instead I'm putting
-;;  passwords and things into secrets.el, and not version controlling
-;;  that file.
+;; This contains some sql db locations and passwords
+;; It is not on github.
+(load-file "~/.emacs.d/secrets.el")
 
-;;  don't need the redshift stuff or anything else other than
-;;  `sane-presto` and the presto stuf.
-
-;;
 (require 'sql)
-
 (use-package sql
   :ensure t
   :init (progn
@@ -689,7 +545,6 @@ Don't know what ARG does."
 
   )
 
-
 (add-hook 'sql-interactive-mode-hook
 	  (lambda ()
 	    (toggle-truncate-lines t)))
@@ -703,9 +558,6 @@ Don't know what ARG does."
 (defvar sql-connection-alist)
 (setq sql-connection-alist '() )
 
-;; This contains some sql db locations and passwords
-;; It is not on github.
-(load-file "~/.emacs.d/secrets.el")
 
 
 ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
@@ -721,21 +573,6 @@ Don't know what ARG does."
   (let ((sql-product 'presto))
     (sql-connect 'presto)
     ))
-
-
-(defvar sql-glitter-program)
-;; (defvar sql-glitter-login-params)
-(setq sql-glitter-program "glitter")
-
-
-(defun sql-rlyeh ()
-  "Connect to Rlyeh."
-  (interactive)
-  (let ((sql-product 'postgres))
-    (sql-connect 'rlyeh)
-    ))
-
-
 
 ;; To connect to a local db sqlite db:
 ;; M-x sql-sqlite
@@ -753,9 +590,6 @@ We don't know what X is."
 
 (defun set-sql-buffer ()
   "Point to *SQL*."
-					; (interactive "b")
-					;  We can probably provide a default arg.
-					;  Should figure out how soon.
   (interactive)
   (setq sql-buffer "*SQL*"))
 
@@ -790,8 +624,7 @@ We don't know what X is."
 	 ("\\.markdown\\'" . markdown-mode))
   :init (progn
 	  (setq markdown-command "multimarkdown")
-	  ;; This does not work.  It is using a weird old definition.
-	  ;;  It doesn't use the serif font.
+	  ;; I don't think the variable-font-buffer part works.
 	  (add-hook 'markdown-mode-hook 'variable-font-buffer)
 	  (add-hook 'gfm-mode-hook 'variable-font-buffer)
 	  )
@@ -799,14 +632,15 @@ We don't know what X is."
 
 
 (use-package vmd-mode
+  ;;  You also need to install vmd
+  ;;  You set up nodejs 14.17.5 with asdf
   :ensure t
   :init (progn
-	  ;; (add-hook 'markdown-mode-hook 'vmd-mode)
-	  ;; (global-set-key (kbd "M-m p") 'vmd-mode)
+	  (add-hook 'markdown-mode-hook 'vmd-mode)
 	  )
   )
 
-;;  Org Mode stuff org-mode org .org orgmode
+;;  Org Mode stuff org-mode org .org orgmode 
 ;;  Don't use use-package, it's already in
 ;;  vanilla emacs.
 (require 'ox-md nil t)
@@ -816,23 +650,12 @@ We don't know what X is."
 (eval-after-load 'org-mode
   '(define-key org-mode-map (kbd "C-c C-t") 'org-todo)
   )
-
 (global-set-key (kbd "C-c C-t") 'org-todo)
 
-;; (setq org-todo-keywords ((sequence "TODO" "BACKLOG" "DONE")))
-
 (setq org-hide-emphasis-markers t)
-(font-lock-add-keywords 'org-mode
-                        '(("^ *\\([-]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-  (custom-theme-set-faces
-   'user
-   '(variable-pitch ((t (:family "ETBembo" :height 180 ))))
-   '(fixed-pitch ((t ( :family "Fira Code Retina" :height 160)))))
-
-  (add-hook 'org-mode-hook 'variable-pitch-mode)
-  (add-hook 'org-mode-hook 'visual-line-mode)
+(add-hook 'org-mode-hook 'variable-pitch-mode)
+(add-hook 'org-mode-hook 'visual-line-mode)
 
  (let* ((variable-tuple
           (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
@@ -844,24 +667,20 @@ We don't know what X is."
          (base-font-color     (face-foreground 'default nil 'default))
          (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
 
-    (custom-theme-set-faces
-     'user
-     `(org-level-8 ((t (,@headline ,@variable-tuple))))
-     `(org-level-7 ((t (,@headline ,@variable-tuple))))
-     `(org-level-6 ((t (,@headline ,@variable-tuple))))
-     `(org-level-5 ((t (,@headline ,@variable-tuple))))
-     `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-     `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
-     `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
-     `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
-     `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+    ;; (custom-theme-set-faces
+    ;;  'user
+    ;;  `(org-level-8 ((t (,@headline ,@variable-tuple))))
+    ;;  `(org-level-7 ((t (,@headline ,@variable-tuple))))
+    ;;  `(org-level-6 ((t (,@headline ,@variable-tuple))))
+    ;;  `(org-level-5 ((t (,@headline ,@variable-tuple))))
+    ;;  `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+    ;;  `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+    ;;  `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+    ;;  `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+    ;;  `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
 
 
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
+;; R Rlang R ESS
 (use-package ess
   :ensure t
   :mode (
@@ -889,54 +708,20 @@ We don't know what X is."
   :ensure t
   )
 
-;; I don't like how you can't really
-;; move the cursor in this.
-;;  I also changed it from ansi-term to term.
-;;
-;;  eshell     - really weird input prompt (unicode or something)
-;;  ansi-term  - no tab complete
-;;  term       - better than the other two, but can't move cursor and can't use M-x anything.
-;;    Also true of eshell.
-;; (defun ipython ()
-;;   "Open an ipython shell."
-;;   (interactive)
-;;   (term "/usr/local/bin/ipython" "ipython"))
+
+;; Python python pyls
+;;  I'd like to remove this all and use pyls
 (defvar python-shell-interpreter)
 (defvar python-shell-interpreter-args)
 ;; From https://github.com/jorgenschaefer/elpy/issues/1106
 (when (executable-find "ipython")
   (setq python-shell-interpreter "ipython"))
 (setq python-shell-interpreter-args "--simple-prompt -i")
-;;  Hooray!  This works!  At least for python2.
-;;  But since the error seemed related to ipython5,
-;;  let's switch pyenv and check again.
-;;  Works fine!  Just complains about grasp, pip can't find it.
 
-
-;; Python
-(use-package elpy
-  :ensure t
-  :init
-  (elpy-enable))
-  ;;  https://stackoverflow.com/a/45223877/1965477
-(add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
-;; You might want to add this
-(setq elpy-eldoc-show-current-function nil)
-;; https://github.com/jorgenschaefer/elpy/issues/1381
-;; Do that if you keep seeing the string awfulness
-
-
-;; taken from http://rakan.me/emacs/python-dev-with-emacs-and-pyenv/
-;; trying to follow https://smythp.com/emacs/python/2016/04/27/pyenv-elpy.html
-;; (use-package pyenv-mode
-;;   :init
-;;   (add-to-list 'exec-path "~/.pyenv/shims")
-;;   (setenv "WORKON_HOME" "~/.pyenv/versions/")
-;;   :config
-;;   (pyenv-mode)
-;;   :bind
-;;   ("C-x p e" . pyenv-activate-current-project))
-
+;; ;; You had an issue where emacs would hang when you opened a string.
+;; ;; https://github.com/jorgenschaefer/elpy/issues/1381 suggests
+;; ;; adding this:
+;; (setq elpy-eldoc-show-current-function nil)
 
 ;;  EIN - Emacs IPython Notebook
 ;;  Do not use the old repo maintained by tkf,
@@ -957,11 +742,11 @@ We don't know what X is."
   (setq ein:jupyter-default-server-command "/usr/local/bin/jupyter"
 	ein:jupyter-server-args (list "--no-browser")))
 
+
 ;;  Does this have to come after rmode?
 (use-package restclient
   :ensure t
   :mode (("\\.restclient\\'" . restclient-mode)))
-
 
 
 ;;  Kind of annoying there is a flymake yaml
@@ -1037,11 +822,6 @@ Version 2015-07-30
 (custom-theme-set-faces
  'sanityinc-solarized-dark
  `(git-commit-summary ((t (:foreground ,"black")))))
-
-;; Slack
-;; (use-package slack
-;;   :ensure t
-;;   :init)
 
 (defun beautify-json ()
   "Format region as json."
