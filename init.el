@@ -498,6 +498,11 @@ Don't know what ARG does."
 ;;  https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client
 ;;  https://www.emacswiki.org/emacs?action=browse;oldid=Gmail%2c_Gnus_and_GPG_on_a_Mac;id=Gmail%2c_Gnus_and_GPG#toc11
 
+;; I put this here I think to avoid linter errors (assignment to free variable)
+;; But note - you need this _BEFORE_ secrets.el
+(defvar sql-connection-alist)
+(setq sql-connection-alist '() )
+
 ;; This contains some sql db locations and passwords
 ;; It is not on github.
 (load-file "~/.emacs.d/secrets.el")
@@ -536,12 +541,6 @@ Don't know what ARG does."
 (setq sql-postgres-program "/usr/local/bin/psql")
 (defvar sql-send-terminator)
 (setq sql-send-terminator t)
-
-;;  I add stuff to this in secrets.el
-(defvar sql-connection-alist)
-(setq sql-connection-alist '() )
-
-
 
 ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
 (defvar sql-presto-program)
@@ -623,7 +622,7 @@ We don't know what X is."
 	  )
   )
 
-;;  Org Mode stuff org-mode org .org orgmode 
+;;  Org Mode stuff org-mode org .org orgmode
 ;;  Don't use use-package, it's already in
 ;;  vanilla emacs.
 (require 'ox-md nil t)
