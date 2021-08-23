@@ -134,18 +134,11 @@ VALUE from 0 = transparent, 100 = opaque"
 ;; Themes
 (use-package color-theme-sanityinc-solarized
   :ensure t
-  :config (progn (load-theme 'sanityinc-solarized-dark t t)
-		 (load-theme 'sanityinc-solarized-light t t)
-		 )
+  :config
+  ;; (progn (load-theme 'sanityinc-solarized-dark t t)
+  ;;        (load-theme 'sanityinc-solarized-light t t)
+  ;;        )
   )
-
-(use-package color-theme-sanityinc-tomorrow
-  :ensure t
-  :config (progn (load-theme 'sanityinc-tomorrow-day t t)
-		 (load-theme 'sanityinc-tomorrow-night t t)
-		 (load-theme 'sanityinc-tomorrow-blue t t)
-		 (load-theme 'sanityinc-tomorrow-bright t t)
-		 (load-theme 'sanityinc-tomorrow-eighties t t)))
 
 (use-package monokai-theme
   :ensure t
@@ -166,25 +159,15 @@ VALUE from 0 = transparent, 100 = opaque"
 
 (use-package cycle-themes
   :ensure t
-  ;;  I can't unbind C-c C-t from cycle-themes
-  ;;  no matter how hard I try.  ) :
   ;;  This is also annoying for ein/jupyter.  Uses c-t for toggling cells.
   ;;  You should fork it and install following  https://github.com/raxod502/straight.el#integration-with-use-package
   ;; your issue is https://github.com/toroidal-code/cycle-themes.el/issues/3
-  :bind (("C-c C-y" . cycle-themes))
   :init (setq cycle-themes-theme-list
 	      '(sanityinc-solarized-light
 		sanityinc-solarized-dark
 		monokai
                 ;; zenburn
 		))
-  :config (progn
-	    (cycle-themes-mode)
-	    (setq cycle-themes-mode-map
-		  (let ((map (make-sparse-keymap)))
-		    (define-key map (kbd "C-c C-y") 'cycle-themes)
-		    map))
-	    )
   )
 
 
@@ -654,19 +637,23 @@ We don't know what X is."
 
 (setq org-hide-emphasis-markers t)
 
-(add-hook 'org-mode-hook 'variable-pitch-mode)
+(add-hook 'org-mode-hook 'org-indent-mode)
+;; (add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 
- (let* ((variable-tuple
-          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
-                ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
-                ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
-                ((x-list-fonts "Verdana")         '(:font "Verdana"))
-                ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
-                (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
-         (base-font-color     (face-foreground 'default nil 'default))
-         (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+;; Don't add new lines
+(setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
 
+
+ ;; (let* ((variable-tuple
+ ;;          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
+ ;;                ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+ ;;                ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+ ;;                ((x-list-fonts "Verdana")         '(:font "Verdana"))
+ ;;                ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+ ;;                (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+ ;;         (base-font-color     (face-foreground 'default nil 'default))
+ ;;         (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
     ;; (custom-theme-set-faces
     ;;  'user
     ;;  `(org-level-8 ((t (,@headline ,@variable-tuple))))
@@ -809,7 +796,7 @@ Version 2015-07-30
 (eval-after-load "dired"
   '(progn (define-key dired-mode-map (kbd "s") 'xah-dired-sort)))
 
-(load-theme 'sanityinc-solarized-light t)
+;; (load-theme 'sanityinc-solarized-light t)
 
 (message "Setting custom faces for solarized light")
 (custom-theme-set-faces
