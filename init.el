@@ -31,14 +31,32 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 ;;  Emacs Lisp Code
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
+;; Bootstrap straight.el
+;; https://github.com/raxod502/straight.el#getting-started
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         ;; Don't _LOVE_ this from a security perspective.
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
 ;;  Basic package setup
-(require 'package)
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives
-	     '("marmalade" . "http://marmalade-repo.org/packages/"))
-(package-initialize)
+;;  NOTE - straight.el told me to remove this.
+;; (require 'package)
+;; (setq package-enable-at-startup nil)
+;; (add-to-list 'package-archives
+;; 	     '("melpa" . "https://melpa.org/packages/"))
+;; (add-to-list 'package-archives
+;; 	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+;; (package-initialize)
+
 
 
 ;; Bootstrap `use-package'
