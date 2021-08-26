@@ -47,26 +47,12 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;;  Basic package setup
-;;  NOTE - straight.el told me to remove this.
-;; (require 'package)
-;; (setq package-enable-at-startup nil)
-;; (add-to-list 'package-archives
-;; 	     '("melpa" . "https://melpa.org/packages/"))
-;; (add-to-list 'package-archives
-;; 	     '("marmalade" . "http://marmalade-repo.org/packages/"))
-;; (package-initialize)
 
-
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(straight-use-package 'use-package)
 
 
 (use-package google-this
-  :ensure t
+  :straight t
   )
 
 
@@ -74,7 +60,7 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 ;;  Shell things
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
-  :ensure t
+  :straight t
   :config
   (exec-path-from-shell-initialize))
 ;; Got this stuff from Mickey Peterson
@@ -86,22 +72,15 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (setenv "ESHELL" shell-file-name)
 
 
-(use-package tramp
-  ;; C-x C-f <ip-address>:<path_to_file>
-  ;; or cd <ip-address>:<path_to_file>
-  ;; You can use it to edit files
-  ;; inside docker containers too!
-  :ensure t)
-
 (use-package osx-browse
   ;; This provides lisp functions to
   ;; open safari.
   ;; It's necessary for things like browse-at-remote.
-  :ensure t)
+  :straight t)
 
 
 (use-package browse-at-remote
-  :ensure t
+  :straight t
   :bind (("C-c g g" . 'browse-at-remote))
   :config (progn
 	    (setq browse-url-browser-function 'osx-browse-url-safari)
@@ -111,7 +90,7 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 
 ;; TeX
 (use-package latex-math-preview
-  :ensure t)
+  :straight t)
 
 ;; Custom tries to put auto-generated code in your init.el
 ;; This will prevent that.
@@ -151,32 +130,30 @@ VALUE from 0 = transparent, 100 = opaque"
 
 ;; Themes
 (use-package color-theme-sanityinc-solarized
-  :ensure t
+  :straight t
   :config
-  ;; (progn (load-theme 'sanityinc-solarized-dark t t)
-  ;;        (load-theme 'sanityinc-solarized-light t t)
-  ;;        )
-  )
+)
 
-(use-package monokai-theme
-  :ensure t
-  )
-
-(use-package spacemacs-common
-  :ensure spacemacs-theme
-  :config
-  )
+(use-package  monokai-theme
+  :straight t
+)
 
 (use-package spaceline
-  :ensure t
+  :straight t
   :init
   (setq powerline-default-separator 'arrow-fade)
   :config
   (require 'spaceline-config)
   (spaceline-spacemacs-theme))
 
+(use-package helpful
+  :straight t
+)
+
 (use-package cycle-themes
-  :ensure t
+  :straight (
+    cycle-themes :type git :host github :repo "toroidal-code/cycle-themes.el"
+                 :fork (:host github :repo "patrickeganfoley/cycle-themes.el"))
   ;;  This is also annoying for ein/jupyter.  Uses c-t for toggling cells.
   ;;  You should fork it and install following  https://github.com/raxod502/straight.el#integration-with-use-package
   ;; your issue is https://github.com/toroidal-code/cycle-themes.el/issues/3
@@ -197,7 +174,7 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package rainbow-delimiters
   ;; I can't see what's going on in lisp code.
   ;; Maybe this will help.
-  :ensure t
+  :straight t
   :init
   (progn
     (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
@@ -206,25 +183,25 @@ VALUE from 0 = transparent, 100 = opaque"
 
 
 (use-package multiple-cursors
-  :ensure t
+  :straight t
   :config ()
   )
 
 ;; I don't really know what this is,
 ;; but I think forge needs it.
 (use-package transient
-  :ensure t
+  :straight t
   )
 
 (defvar ghub-use-workaround-for-emacs-bug)
 (setq ghub-use-workaround-for-emacs-bug nil)
 
 (use-package ghub
-  :ensure t
+  :straight t
   )
 
 (use-package magit
-  :ensure t
+  :straight t
   :bind (("C-x g" . magit-status))
   :config (progn
 	    ;; The following two are critical for making magit 2.1.0 work more
@@ -239,7 +216,7 @@ VALUE from 0 = transparent, 100 = opaque"
 
 ;; https://emacsair.me/2018/12/19/forge-0.1/
 (use-package forge
-  :ensure t
+  :straight t
   :after magit
   )
 
@@ -249,7 +226,7 @@ VALUE from 0 = transparent, 100 = opaque"
 ;;  I removed	ido-everywhere t
 ;;  b/c it breaks too many things.
 (use-package ido
-  :ensure t
+  :straight t
   :config
   (setq ido-enable-flex-matching t
 	ido-create-new-buffer 'always
@@ -264,7 +241,7 @@ VALUE from 0 = transparent, 100 = opaque"
 ;; smex helps you quickly look up commands
 ;; C-s and C-r cycle commands, Enter executes selected command.
 (use-package smex
-  :ensure t
+  :straight t
   :init (smex-initialize)
   :bind ("M-x" . smex))
 
@@ -388,7 +365,7 @@ Don't know what ARG does."
 ;;  I disable company-mode in eshell and org-mode,
 ;;  otherwise it messes with the asteriskses.
 (use-package company
-  :ensure t
+  :straight t
   :diminish company-mode
   :init
   (add-hook 'after-init-hook 'global-company-mode)
@@ -396,7 +373,7 @@ Don't know what ARG does."
   ;;(progn
   ;;  jedi breaks w/ pyenv.
   ;;(use-package company-jedi
-  ;;   :ensure t)
+  ;;   :straight t)
   ;;)
   ;; :bind
   ;; ("<tab>" . company-complete)
@@ -414,7 +391,7 @@ Don't know what ARG does."
 ;;    *  flycheck does not check syntax itself, but calls
 ;;       external programs you need to install.
 (use-package flycheck
-  :ensure t
+  :straight t
   :init (global-flycheck-mode)
   ;; Use C-c ! v to check out flycheck settings
   ;; Use C-c ! n to check the next error!
@@ -428,14 +405,14 @@ Don't know what ARG does."
 ;;   * My main issue right now is I don't get type checks / they're often incorrect.  I think mypy ought to solve this, but I'm holding off on that until I fix the whole python situation using pyls.
 
 (use-package blacken
-  :ensure t
+  :straight t
   :config
   ;;(add-hook 'python-mode-hook 'blacken-mode)
   )
 
 
 (use-package py-yapf
-  :ensure t
+  :straight t
   )
 
 
@@ -463,13 +440,13 @@ Don't know what ARG does."
 
 ;; Scala
 (use-package scala-mode
-  :ensure t
+  :straight t
   :interpreter
   ("scala" . scala-mode))
 
 ;; Golang
 (use-package go-mode
-  :ensure t
+  :straight t
   :init
   (progn
     (setq gofmt-command "goimports")
@@ -522,7 +499,7 @@ Don't know what ARG does."
 
 (require 'sql)
 (use-package sql
-  :ensure t
+  :straight t
   :init (progn
 	  (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
 	  ;; This is great!  You can sort sql results
@@ -617,7 +594,7 @@ We don't know what X is."
 
 
 (use-package markdown-mode
-  :ensure t
+  :straight t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
 	 ("readme\\.md\\'" . gfm-mode)
@@ -635,7 +612,7 @@ We don't know what X is."
 (use-package vmd-mode
   ;;  You also need to install vmd
   ;;  You set up nodejs 14.17.5 with asdf
-  :ensure t
+  :straight t
   :init (progn
 	  (add-hook 'markdown-mode-hook 'vmd-mode)
 	  )
@@ -645,13 +622,6 @@ We don't know what X is."
 ;;  Don't use use-package, it's already in
 ;;  vanilla emacs.
 (require 'ox-md nil t)
-
-;;  cycle-themes took C-c C-t...
-;;  I need to change cycle-themes.
-(eval-after-load 'org-mode
-  '(define-key org-mode-map (kbd "C-c C-t") 'org-todo)
-  )
-(global-set-key (kbd "C-c C-t") 'org-todo)
 
 (setq org-hide-emphasis-markers t)
 
@@ -687,7 +657,7 @@ We don't know what X is."
 
 ;; R Rlang R ESS
 (use-package ess
-  :ensure t
+  :straight t
   :mode (
 	 ("\\.r\\'" . r-mode)
 	 ("\\.R\\'" . r-mode)
@@ -696,21 +666,21 @@ We don't know what X is."
   )
 
 (use-package polymode
-  :ensure t
+  :straight t
   :commands (poly-markdown+r-mode)
   :mode (("\\.rmd\\'" . poly-markdown+r-mode)
 	 ("\\.Rmd\\'" . poly-markdown+r-mode))
   )
 
 (use-package poly-markdown
-  :ensure t
+  :straight t
   :mode (
 	 ("\\.md\\'" . poly-markdown-mode)
 	 )
   )
 
 (use-package poly-R
-  :ensure t
+  :straight t
   )
 
 
@@ -739,7 +709,7 @@ We don't know what X is."
 ;;    run ein:notebooklist-login, use the password
 ;;    
 (use-package ein
-  :ensure t
+  :straight t
   :commands (ein:notebooklist-open)
   :config
   (defvar ein:jupyter-default-server-command)
@@ -750,14 +720,14 @@ We don't know what X is."
 
 ;;  Does this have to come after rmode?
 (use-package restclient
-  :ensure t
+  :straight t
   :mode (("\\.restclient\\'" . restclient-mode)))
 
 
 ;;  Kind of annoying there is a flymake yaml
 ;;  but no flycheck-yaml
 (use-package yaml-mode
-  :ensure t
+  :straight t
   :mode "\\.yaml\\'"
   :mode "\\.portal\\'"
   :mode "\\.portal_monitoring\\'")
@@ -779,7 +749,7 @@ We don't know what X is."
   ;;    C-c p s s  Runs ag on the project. Requires the presence of ag.el.
   ;;    (This is recommended instead of projectile isearch)
   ;;    C-c p C-h (shows all projectile bindings)
-  :ensure t
+  :straight t
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :config (progn
@@ -814,20 +784,6 @@ Version 2015-07-30
 (eval-after-load "dired"
   '(progn (define-key dired-mode-map (kbd "s") 'xah-dired-sort)))
 
-;; (load-theme 'sanityinc-solarized-light t)
-
-(message "Setting custom faces for solarized light")
-(custom-theme-set-faces
- 'sanityinc-solarized-light
- `(git-commit-summary ((t (:foreground ,"black"))))
- `(ein:cell-input-area ((t (:foreground ,"black"))))
- `(ein:cell-input-area ((t (:background ,"fdf6e3")))))
-
-(message "Setting custom faces for solarized dark")
-(custom-theme-set-faces
- 'sanityinc-solarized-dark
- `(git-commit-summary ((t (:foreground ,"black")))))
-
 (defun beautify-json ()
   "Format region as json."
   (interactive)
@@ -839,7 +795,7 @@ Version 2015-07-30
 ;; Want to be able to quickly look at json/events from presto
 ;; pulled from https://stackoverflow.com/questions/435847/emacs-mode-to-edit-json
 (use-package json-mode
-  :ensure t
+  :straight t
   :mode (("\\.json\\'" . json-mode))
   :config (setq-default js-indent-level 4))
 
