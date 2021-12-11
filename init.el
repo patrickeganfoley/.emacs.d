@@ -52,8 +52,7 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 
 
 (use-package google-this
-  :straight t
-  )
+  :straight t)
 
 
 
@@ -71,21 +70,20 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (setenv "SHELL" shell-file-name)
 (setenv "ESHELL" shell-file-name)
 
-
 (use-package osx-browse
-  ;; This provides lisp functions to
-  ;; open safari.
-  ;; It's necessary for things like browse-at-remote.
   :straight t)
-
+;; This provides lisp functions to
+;; open safari.
+;; It's necessary for things like browse-at-remote.
 
 (use-package browse-at-remote
   :straight t
-  :bind (("C-c g g" . 'browse-at-remote))
+  :bind ("C-c g g" . browse-at-remote)
   :config (progn
 	    (setq browse-url-browser-function 'osx-browse-url-safari)
 	    (setq browse-url-browser-function 'osx-browse-url-safari)
-	    (setq browse-url-browser-function 'osx-browse-url-safari)))
+	    (setq browse-url-browser-function 'osx-browse-url-safari))
+)
 
 
 ;; TeX
@@ -438,6 +436,22 @@ Don't know what ARG does."
   (setq flycheck-python-flake8-executable "flake82")
   )
 
+(defun pyvenv (venv)
+  "Tell flycheck to use pylint, flake8, etc.. from a VENV."
+  (interactive "sChoose a venv from ~/venvs/")
+  ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
+  (message "Setting pylint & flake8 for flycheck to use %s " venv)
+  (setq flycheck-python-pylint-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint")
+        )
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83")
+        )
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
+        )
+  )
+
 ;; Scala
 (use-package scala-mode
   :straight t
@@ -631,6 +645,21 @@ We don't know what X is."
 ;; Don't add new lines
 (setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
 
+;; subscripts/superscripts 
+;; https://orgmode.org/manual/Subscripts-and-Superscripts.html#Subscripts-and-Superscripts
+(setq org-pretty-entities t)
+(setq org-pretty-entities-include-sub-superscripts t)
+
+;; kanban
+(use-package org-kanban
+  :straight t
+  :config 
+  (setq
+   org-kanban/layout '("..." . 24)
+   org-kanban/next-keys "tf"
+   org-kanban/prev-keys "tb"
+  )
+)
 
  ;; (let* ((variable-tuple
  ;;          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
