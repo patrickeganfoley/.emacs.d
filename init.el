@@ -626,9 +626,6 @@ We don't know what X is."
   ;;  You also need to install vmd
   ;;  You set up nodejs 14.17.5 with asdf
   :straight t
-  :init (progn
-	  (add-hook 'markdown-mode-hook 'vmd-mode)
-	  )
   )
 
 ;;  Org Mode stuff org-mode org .org orgmode
