@@ -417,25 +417,6 @@ Don't know what ARG does."
 ;;  flycheck uses https://github.com/jimhester/lintr for R
 
 
-;; (setq pythons-list
-;;      '("python2" "python3"))
-;;  TODO: change this so it takes a venv as an arg.
-(defun py3 ()
-  "Tell flycheck to use python3."
-  (interactive)
-  ;;(setq flycheck-python-pycompile-executable "python3")
-  (setq flycheck-python-pylint-executable "/Users/patrickfoley/venvs/396/bin/pylint")
-  (setq flycheck-python-flake8-executable "/Users/patrickfoley/venvs/396/bin/flake83")
-  )
-
-(defun py2 ()
-  "Tell flycheck to use python2."
-  (interactive)
-  (setq flycheck-python-pycompile-executable "python2")
-  (setq flycheck-python-pylint-executable "pylint2")
-  (setq flycheck-python-flake8-executable "flake82")
-  )
-
 (defun pyvenv (venv)
   "Tell flycheck to use pylint, flake8, etc.. from a VENV."
   (interactive "sChoose a venv from ~/venvs/")
