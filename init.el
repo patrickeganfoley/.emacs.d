@@ -368,18 +368,10 @@ Don't know what ARG does."
   :init
   (add-hook 'after-init-hook 'global-company-mode)
   (setq company-global-modes '(not eshell-mode shell-mode org-mode))
-  ;;(progn
-  ;;  jedi breaks w/ pyenv.
-  ;;(use-package company-jedi
-  ;;   :straight t)
-  ;;)
   ;; :bind
   ;; ("<tab>" . company-complete)
   ;; ("<tab>" . company-complete-common)
   ;;:config
-  ;; (defun my/python-mode-hook ()
-  ;;  (add-to-list 'company-backends 'company-jedi))
-					;(add-hook 'python-mode-hook 'my/python-mode-hook))
   )
 
 
@@ -400,7 +392,6 @@ Don't know what ARG does."
 ;;   *  For flake8, put things in setup.cfg with a [flake8] at the top of the file.
 ;;      You will also need to add a .dir_locals.el containing
 ;;      ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
-;;   * My main issue right now is I don't get type checks / they're often incorrect.  I think mypy ought to solve this, but I'm holding off on that until I fix the whole python situation using pyls.
 
 (use-package blacken
   :straight t
@@ -431,7 +422,11 @@ Don't know what ARG does."
   (setq flycheck-python-flake8-executable
         (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
         )
-  )
+  (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
+  (setq lsp-pyright-python-executable-cmd
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/python")
+        )
+)
 
 ;; Scala
 (use-package scala-mode
@@ -689,20 +684,41 @@ We don't know what X is."
   :straight t
   )
 
+;; Let me try to redo my python setup to use lsp-mode.
+;; I'm following https://ianyepan.github.io/posts/emacs-ide/ and https://github.com/emacs-lsp/lsp-pyright
+;; I'd also like to do this for R so my emacs stops crashing.
+;; How does this work?
+;; With lsp - you have a client (the emacs lsp-mode package) and a server.
+;; Microsoft's pyright is the server we'll use.  We also need lsp-pyright as a layer
+;; between lsp-mode and the pyright server.
+(use-package lsp-mode
+  :straight t
+  :hook ((python-mode) . lsp-deferred)
+  :commands lsp)
 
-;; Python python pyls
-;;  I'd like to remove this all and use pyls
-(defvar python-shell-interpreter)
-(defvar python-shell-interpreter-args)
-;; From https://github.com/jorgenschaefer/elpy/issues/1106
-(when (executable-find "ipython")
-  (setq python-shell-interpreter "ipython"))
-(setq python-shell-interpreter-args "--simple-prompt -i")
+(use-package lsp-ui
+  :straight t
+  :commands lsp-ui-mode)
 
-;; ;; You had an issue where emacs would hang when you opened a string.
-;; ;; https://github.com/jorgenschaefer/elpy/issues/1381 suggests
-;; ;; adding this:
-;; (setq elpy-eldoc-show-current-function nil)
+;; check out these settings
+;; (use-package lsp-ui
+;;   :commands lsp-ui-mode
+;;   :config
+;;   (setq lsp-ui-doc-enable nil)
+;;   (setq lsp-ui-doc-header t)
+;;   (setq lsp-ui-doc-include-signature t)
+;;   (setq lsp-ui-doc-border (face-foreground 'default))
+;;   (setq lsp-ui-sideline-show-code-actions t)
+;;   (setq lsp-ui-sideline-delay 0.05))
+
+;; Note - you'll need to run pip install pyright first.
+(use-package lsp-pyright
+  :straight t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp)))
+  ;; Note!  See the pyvenv() function!  This determines the python executable!
+
 
 ;;  EIN - Emacs IPython Notebook
 ;;  Do not use the old repo maintained by tkf,
