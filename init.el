@@ -21,6 +21,8 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (electric-indent-mode -1)
+(set-fringe-mode 10)  ;; size of margins in pixels
+
 
 ;; Always make tabs into spaces
 (setq-default indent-tabs-mode nil)
@@ -46,10 +48,25 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+;; M-x straight-check-<package/all>
+;; M-x straight-rebuild-<package/all>
+;;
+;; Set straight-check-for-modifications to nil before the bootstrap if
+;; you don't want straight to do automatic updating.
 
 
 (straight-use-package 'use-package)
 
+(use-package command-log-mode
+  :straight t
+)
+
+(use-package doom-modeline
+  :straight t
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15))
+  ;;  why does this not set at startup?
+)
 
 (use-package google-this
   :straight t
@@ -165,6 +182,7 @@ VALUE from 0 = transparent, 100 = opaque"
 		))
   )
 
+(load-theme 'monokai t)
 
 ;; Things I looked at and turned off
 ;;   *  smart-parens
@@ -175,29 +193,21 @@ VALUE from 0 = transparent, 100 = opaque"
   ;; I can't see what's going on in lisp code.
   ;; Maybe this will help.
   :straight t
-  :init
-  (progn
-    (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
-    )
+  :hook (prog-mode . rainbow-delimiters-mode)
   )
 
+(use-package which-key
+  :straight t
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 1.5)
+  ;; I can't scroll through the display?
+)
 
 (use-package multiple-cursors
   :straight t
   :config ()
-  )
-
-;; I don't really know what this is,
-;; but I think forge needs it.
-(use-package transient
-  :straight t
-  )
-
-(defvar ghub-use-workaround-for-emacs-bug)
-(setq ghub-use-workaround-for-emacs-bug nil)
-
-(use-package ghub
-  :straight t
   )
 
 (use-package magit
@@ -218,6 +228,19 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package forge
   :straight t
   :after magit
+  )
+
+;; I don't really know what this is,
+;; but I think forge needs it.
+(use-package transient
+  :straight t
+  )
+
+(defvar ghub-use-workaround-for-emacs-bug)
+(setq ghub-use-workaround-for-emacs-bug nil)
+
+(use-package ghub
+  :straight t
   )
 
 ;; ido is 'interactively do' things
@@ -345,6 +368,13 @@ Don't know what ARG does."
 ;; https://emacs.stackexchange.com/questions/42164/convention-about-using-c-x-or-c-c-as-prefix-keys
 (global-set-key (kbd "C-c z") 'toggle-maximize-buffer)
 
+;; helm/ivy/company autocomplete?
+(use-package ivy
+  :straight t
+  :config
+  (ivy-mode 1)
+ ;; you might also want counsel and swiper
+)
 
 
 ;;  Autocomplete
@@ -355,7 +385,7 @@ Don't know what ARG does."
 ;;  you install different backends for syntax checking with
 ;;  flycheck.
 ;;
-;;  It looks like 'helm' is also a big auto complete thing
+
 ;;
 ;;  Python has two major auto complete backends that work
 ;;  with company: jedi and rope.  rope is more about
