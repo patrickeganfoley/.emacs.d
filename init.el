@@ -1,7 +1,7 @@
 ;;; init.el --- P Foley emacs configs
 ;;; Commentary:
 
-;;  rebuilt with [these instructions](https://news.ycombinator.com/item?id=9595396)
+;; replacing the brew tap railwaycat/emacs-mac; brew install emacs-mac version i with https://emacsformacosx.com/
 (setq mac-command-modifier 'meta ;; I want this to do nothing.
       mac-option-modifier 'meta)
 
@@ -162,11 +162,6 @@ VALUE from 0 = transparent, 100 = opaque"
                 ;; zenburn
 		))
   )
-
-
-;; Things I looked at and turned off
-;;   *  smart-parens
-;;   *  a ton of orgmode things (e.g. special unicode bullets)
 
 
 (use-package rainbow-delimiters
@@ -407,26 +402,6 @@ Don't know what ARG does."
 
 ;;  flycheck uses https://github.com/jimhester/lintr for R
 
-
-(defun pyvenv (venv)
-  "Tell flycheck to use pylint, flake8, etc.. from a VENV."
-  (interactive "sChoose a venv from ~/venvs/")
-  ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
-  (message "Setting pylint & flake8 for flycheck to use %s " venv)
-  (setq flycheck-python-pylint-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint")
-        )
-  (setq flycheck-python-flake8-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83")
-        )
-  (setq flycheck-python-flake8-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
-        )
-  (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
-  (setq lsp-pyright-python-executable-cmd
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/python")
-        )
-)
 
 ;; Scala
 (use-package scala-mode
@@ -698,17 +673,19 @@ We don't know what X is."
 
 (use-package lsp-ui
   :straight t
-  :commands lsp-ui-mode)
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-doc-header t)
+  (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-border (face-foreground 'default))
+  (setq lsp-ui-sideline-show-code-actions t)
+)
 
 ;; check out these settings
 ;; (use-package lsp-ui
 ;;   :commands lsp-ui-mode
 ;;   :config
-;;   (setq lsp-ui-doc-enable nil)
-;;   (setq lsp-ui-doc-header t)
-;;   (setq lsp-ui-doc-include-signature t)
-;;   (setq lsp-ui-doc-border (face-foreground 'default))
-;;   (setq lsp-ui-sideline-show-code-actions t)
+;;   (setq lsp-ui-doc-enable nil)      
 ;;   (setq lsp-ui-sideline-delay 0.05))
 
 ;; Note - you'll need to run pip install pyright first.
@@ -717,7 +694,48 @@ We don't know what X is."
   :hook (python-mode . (lambda ()
                           (require 'lsp-pyright)
                           (lsp)))
+  :config
+  (setq lsp-pyright-venv-directory "/Users/patrickfoley/venvs/")
   ;; Note!  See the pyvenv() function!  This determines the python executable!
+)
+
+
+(use-package pyvenv
+  :straight t
+  :config
+  (pyvenv-mode t)
+
+  ;; you want M-x pyvenv-activate RET dir_to_the_environment/env
+  ;; and then `C-c C-p`
+
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
+
+(defun my_set_venv (venv)
+  "Tell flycheck to use pylint, flake8, etc.. from a VENV."
+  (interactive "sChoose a venv from ~/venvs/")
+  ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
+  (message "Setting pylint & flake8 for flycheck to use %s " venv)
+  (setq flycheck-python-pylint-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint")
+        )
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83")
+        )
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
+        )
+  (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
+  (setq lsp-pyright-python-executable-cmd
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/python")
+        )
+)
+
 
 
 ;;  EIN - Emacs IPython Notebook
