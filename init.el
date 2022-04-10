@@ -243,31 +243,6 @@ VALUE from 0 = transparent, 100 = opaque"
   :straight t
   )
 
-;; ido is 'interactively do' things
-;; it powers smex but also lets you find files
-;; anywhere.  same with buffers
-;;  I removed	ido-everywhere t
-;;  b/c it breaks too many things.
-(use-package ido
-  :straight t
-  :config
-  (setq ido-enable-flex-matching t
-	ido-create-new-buffer 'always
-	ido-everywhere nil
-	ido-use-filename-at-point nil
-	;; This one prevents in when finding a file
-	;; https://stackoverflow.com/a/18089076
-	ido-auto-merge-work-directories-length -1)
-  (ido-mode +1))
-
-
-;; smex helps you quickly look up commands
-;; C-s and C-r cycle commands, Enter executes selected command.
-(use-package smex
-  :straight t
-  :init (smex-initialize)
-  :bind ("M-x" . smex))
-
 
 					; Original idea from
 ;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
@@ -376,6 +351,15 @@ Don't know what ARG does."
  ;; you might also want counsel and swiper
 )
 
+(use-package counsel
+  :straight t
+  :after ivy
+  :config (counsel-mode))
+
+(use-package ivy-rich 
+  :straight t
+  :init
+  (ivy-rich-mode 1)
 
 ;;  Autocomplete
 ;;  The major autocompletion tools are company mode and
