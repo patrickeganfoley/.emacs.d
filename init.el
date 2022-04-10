@@ -1,7 +1,7 @@
 ;;; init.el --- P Foley emacs configs
 ;;; Commentary:
 
-;;  rebuilt with [these instructions](https://news.ycombinator.com/item?id=9595396)
+;; replacing the brew tap railwaycat/emacs-mac; brew install emacs-mac version i with https://emacsformacosx.com/
 (setq mac-command-modifier 'meta ;; I want this to do nothing.
       mac-option-modifier 'meta)
 
@@ -69,8 +69,7 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 )
 
 (use-package google-this
-  :straight t
-  )
+  :straight t)
 
 
 
@@ -88,21 +87,20 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (setenv "SHELL" shell-file-name)
 (setenv "ESHELL" shell-file-name)
 
-
 (use-package osx-browse
-  ;; This provides lisp functions to
-  ;; open safari.
-  ;; It's necessary for things like browse-at-remote.
   :straight t)
-
+;; This provides lisp functions to
+;; open safari.
+;; It's necessary for things like browse-at-remote.
 
 (use-package browse-at-remote
   :straight t
-  :bind (("C-c g g" . 'browse-at-remote))
+  :bind ("C-c g g" . browse-at-remote)
   :config (progn
 	    (setq browse-url-browser-function 'osx-browse-url-safari)
 	    (setq browse-url-browser-function 'osx-browse-url-safari)
-	    (setq browse-url-browser-function 'osx-browse-url-safari)))
+	    (setq browse-url-browser-function 'osx-browse-url-safari))
+)
 
 
 ;; TeX
@@ -183,11 +181,6 @@ VALUE from 0 = transparent, 100 = opaque"
   )
 
 (load-theme 'monokai t)
-
-;; Things I looked at and turned off
-;;   *  smart-parens
-;;   *  a ton of orgmode things (e.g. special unicode bullets)
-
 
 (use-package rainbow-delimiters
   ;; I can't see what's going on in lisp code.
@@ -384,18 +377,10 @@ Don't know what ARG does."
   :init
   (add-hook 'after-init-hook 'global-company-mode)
   (setq company-global-modes '(not eshell-mode shell-mode org-mode))
-  ;;(progn
-  ;;  jedi breaks w/ pyenv.
-  ;;(use-package company-jedi
-  ;;   :straight t)
-  ;;)
   ;; :bind
   ;; ("<tab>" . company-complete)
   ;; ("<tab>" . company-complete-common)
   ;;:config
-  ;; (defun my/python-mode-hook ()
-  ;;  (add-to-list 'company-backends 'company-jedi))
-					;(add-hook 'python-mode-hook 'my/python-mode-hook))
   )
 
 
@@ -416,7 +401,6 @@ Don't know what ARG does."
 ;;   *  For flake8, put things in setup.cfg with a [flake8] at the top of the file.
 ;;      You will also need to add a .dir_locals.el containing
 ;;      ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
-;;   * My main issue right now is I don't get type checks / they're often incorrect.  I think mypy ought to solve this, but I'm holding off on that until I fix the whole python situation using pyls.
 
 (use-package blacken
   :straight t
@@ -432,25 +416,6 @@ Don't know what ARG does."
 
 ;;  flycheck uses https://github.com/jimhester/lintr for R
 
-
-;; (setq pythons-list
-;;      '("python2" "python3"))
-;;  TODO: change this so it takes a venv as an arg.
-(defun py3 ()
-  "Tell flycheck to use python3."
-  (interactive)
-  ;;(setq flycheck-python-pycompile-executable "python3")
-  (setq flycheck-python-pylint-executable "/Users/patrickfoley/venvs/396/bin/pylint")
-  (setq flycheck-python-flake8-executable "/Users/patrickfoley/venvs/396/bin/flake83")
-  )
-
-(defun py2 ()
-  "Tell flycheck to use python2."
-  (interactive)
-  (setq flycheck-python-pycompile-executable "python2")
-  (setq flycheck-python-pylint-executable "pylint2")
-  (setq flycheck-python-flake8-executable "flake82")
-  )
 
 ;; Scala
 (use-package scala-mode
@@ -626,9 +591,6 @@ We don't know what X is."
   ;;  You also need to install vmd
   ;;  You set up nodejs 14.17.5 with asdf
   :straight t
-  :init (progn
-	  (add-hook 'markdown-mode-hook 'vmd-mode)
-	  )
   )
 
 ;;  Org Mode stuff org-mode org .org orgmode
@@ -645,6 +607,21 @@ We don't know what X is."
 ;; Don't add new lines
 (setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
 
+;; subscripts/superscripts 
+;; https://orgmode.org/manual/Subscripts-and-Superscripts.html#Subscripts-and-Superscripts
+(setq org-pretty-entities t)
+(setq org-pretty-entities-include-sub-superscripts t)
+
+;; kanban
+(use-package org-kanban
+  :straight t
+  :config 
+  (setq
+   org-kanban/layout '("..." . 24)
+   org-kanban/next-keys "tf"
+   org-kanban/prev-keys "tb"
+  )
+)
 
  ;; (let* ((variable-tuple
  ;;          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
@@ -696,20 +673,84 @@ We don't know what X is."
   :straight t
   )
 
+;; Let me try to redo my python setup to use lsp-mode.
+;; I'm following https://ianyepan.github.io/posts/emacs-ide/ and https://github.com/emacs-lsp/lsp-pyright
+;; I'd also like to do this for R so my emacs stops crashing.
+;; How does this work?
+;; With lsp - you have a client (the emacs lsp-mode package) and a server.
+;; Microsoft's pyright is the server we'll use.  We also need lsp-pyright as a layer
+;; between lsp-mode and the pyright server.
+(use-package lsp-mode
+  :straight t
+  :hook ((python-mode) . lsp-deferred)
+  :commands lsp)
 
-;; Python python pyls
-;;  I'd like to remove this all and use pyls
-(defvar python-shell-interpreter)
-(defvar python-shell-interpreter-args)
-;; From https://github.com/jorgenschaefer/elpy/issues/1106
-(when (executable-find "ipython")
-  (setq python-shell-interpreter "ipython"))
-(setq python-shell-interpreter-args "--simple-prompt -i")
+(use-package lsp-ui
+  :straight t
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-doc-header t)
+  (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-border (face-foreground 'default))
+  (setq lsp-ui-sideline-show-code-actions t)
+)
 
-;; ;; You had an issue where emacs would hang when you opened a string.
-;; ;; https://github.com/jorgenschaefer/elpy/issues/1381 suggests
-;; ;; adding this:
-;; (setq elpy-eldoc-show-current-function nil)
+;; check out these settings
+;; (use-package lsp-ui
+;;   :commands lsp-ui-mode
+;;   :config
+;;   (setq lsp-ui-doc-enable nil)      
+;;   (setq lsp-ui-sideline-delay 0.05))
+
+;; Note - you'll need to run pip install pyright first.
+(use-package lsp-pyright
+  :straight t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp)))
+  :config
+  (setq lsp-pyright-venv-directory "/Users/patrickfoley/venvs/")
+  ;; Note!  See the pyvenv() function!  This determines the python executable!
+)
+
+
+(use-package pyvenv
+  :straight t
+  :config
+  (pyvenv-mode t)
+
+  ;; you want M-x pyvenv-activate RET dir_to_the_environment/env
+  ;; and then `C-c C-p`
+
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
+
+(defun my_set_venv (venv)
+  "Tell flycheck to use pylint, flake8, etc.. from a VENV."
+  (interactive "sChoose a venv from ~/venvs/")
+  ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
+  (message "Setting pylint & flake8 for flycheck to use %s " venv)
+  (setq flycheck-python-pylint-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint")
+        )
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83")
+        )
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
+        )
+  (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
+  (setq lsp-pyright-python-executable-cmd
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/python")
+        )
+)
+
+
 
 ;;  EIN - Emacs IPython Notebook
 ;;  Do not use the old repo maintained by tkf,
