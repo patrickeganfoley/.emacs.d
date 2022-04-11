@@ -150,15 +150,6 @@ VALUE from 0 = transparent, 100 = opaque"
 )
 
 
-;; Does this conflict with doom-line?
-(use-package spaceline
-  :straight t
-  :init
-  (setq powerline-default-separator 'arrow-fade)
-  :config
-  (require 'spaceline-config)
-  (spaceline-spacemacs-theme))
-
 (use-package helpful
   :straight t
 )
@@ -217,6 +208,9 @@ VALUE from 0 = transparent, 100 = opaque"
 
 
 ;; https://emacsair.me/2018/12/19/forge-0.1/
+;; NOTE: Make sure to configure a GitHub token before using this package!
+;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
 (use-package forge
   :straight t
   :after magit
@@ -354,8 +348,7 @@ Don't know what ARG does."
          ("C-r" . 'counsel-minibuffer-history))
 )
 
-
-(use-package ivy-rich 
+(use-package ivy-rich
   :straight t
   :init
   (ivy-rich-mode 1)
@@ -370,8 +363,8 @@ Don't know what ARG does."
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key)
-)
 
+)
 
 ;;  Autocomplete
 ;;  The major autocompletion tools are company mode and
@@ -825,9 +818,17 @@ We don't know what X is."
   :straight t
   :bind-keymap
   ("C-c p" . projectile-command-map)
+  :custom 
+  (projectile-completion-system 'ivy)
   :config (progn
 	    (setq projectile-enable-caching t)
-	    (setq projectile-switch-project-action 'projectile-dired)))
+	    (setq projectile-switch-project-action 'projectile-dired))
+)
+
+(use-package counsel-projectile
+  :straight t
+  :config (counsel-projectile-mode)
+)
 
 
 
