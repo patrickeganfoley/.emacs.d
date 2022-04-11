@@ -144,15 +144,13 @@ VALUE from 0 = transparent, 100 = opaque"
 
 
 ;; Themes
-(use-package color-theme-sanityinc-solarized
+(use-package doom-themes
   :straight t
-  :config
+  :init (load-theme 'doom-monokai-classic)
 )
 
-(use-package  monokai-theme
-  :straight t
-)
 
+;; Does this conflict with doom-line?
 (use-package spaceline
   :straight t
   :init
@@ -173,14 +171,15 @@ VALUE from 0 = transparent, 100 = opaque"
   ;;  You should fork it and install following  https://github.com/raxod502/straight.el#integration-with-use-package
   ;; your issue is https://github.com/toroidal-code/cycle-themes.el/issues/3
   :init (setq cycle-themes-theme-list
-	      '(sanityinc-solarized-light
-		sanityinc-solarized-dark
-		monokai
+	      '(doom-solarized-light
+		doom-solarized-dark
+		doom-monokai-classic
                 ;; zenburn
-		))
+		)
+              )
   )
 
-(load-theme 'monokai t)
+;; (load-theme 'monokai t)
 
 (use-package rainbow-delimiters
   ;; I can't see what's going on in lisp code.
@@ -347,12 +346,32 @@ Don't know what ARG does."
 (use-package counsel
   :straight t
   :after ivy
-  :config (counsel-mode))
+  :config (counsel-mode)
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+)
+
 
 (use-package ivy-rich 
   :straight t
   :init
   (ivy-rich-mode 1)
+)
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key)
+)
+
 
 ;;  Autocomplete
 ;;  The major autocompletion tools are company mode and
