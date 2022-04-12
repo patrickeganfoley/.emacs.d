@@ -57,14 +57,30 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 
 (straight-use-package 'use-package)
 
+;; Custom tries to put auto-generated code in your init.el
+;; This will prevent that.
+;; https://emacs.stackexchange.com/a/29746
+(setq custom-file "~/.emacs.d/custom.el")
+(load-file custom-file)
+
+
+
 (use-package command-log-mode
   :straight t
 )
 
+;; Without this, doom-modeline will display chinese characters, which
+;; I cannot read.
+;; You also need to run M-x all-the-icons-install-fonts
+(use-package all-the-icons
+  :straight t
+  :if (display-graphic-p))
+
 (use-package doom-modeline
   :straight t
   :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15))
+  :custom
+  (doom-modeline-height 15)
   ;;  why does this not set at startup?
 )
 
@@ -107,12 +123,6 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (use-package latex-math-preview
   :straight t)
 
-;; Custom tries to put auto-generated code in your init.el
-;; This will prevent that.
-;; https://emacs.stackexchange.com/a/29746
-(setq custom-file "~/.emacs.d/custom.el")
-(load-file custom-file)
-
 ;; This is me trying to learn lisp
 (defun load-init ()
   "Reload the init file.  I am learning how to write elisp."
@@ -149,11 +159,6 @@ VALUE from 0 = transparent, 100 = opaque"
   :init (load-theme 'doom-monokai-classic)
 )
 
-
-(use-package helpful
-  :straight t
-)
-
 (use-package cycle-themes
   :straight (
     cycle-themes :type git :host github :repo "toroidal-code/cycle-themes.el"
@@ -188,6 +193,8 @@ VALUE from 0 = transparent, 100 = opaque"
   ;; I can't scroll through the display?
 )
 
+
+
 (use-package multiple-cursors
   :straight t
   :config ()
@@ -221,14 +228,6 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package transient
   :straight t
   )
-
-(defvar ghub-use-workaround-for-emacs-bug)
-(setq ghub-use-workaround-for-emacs-bug nil)
-
-(use-package ghub
-  :straight t
-  )
-
 
 					; Original idea from
 ;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
@@ -414,16 +413,6 @@ Don't know what ARG does."
 ;;      You will also need to add a .dir_locals.el containing
 ;;      ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
 
-(use-package blacken
-  :straight t
-  :config
-  ;;(add-hook 'python-mode-hook 'blacken-mode)
-  )
-
-
-(use-package py-yapf
-  :straight t
-  )
 
 
 ;;  flycheck uses https://github.com/jimhester/lintr for R
@@ -722,12 +711,15 @@ We don't know what X is."
                           (lsp)))
   :config
   (setq lsp-pyright-venv-directory "/Users/patrickfoley/venvs/")
+  (setq lsp-pyright-venv-path "/Users/patrickfoley/venvs/")
   ;; Note!  See the pyvenv() function!  This determines the python executable!
 )
 
 
 (use-package pyvenv
   :straight t
+  :init
+  (setenv "WORKON_HOME" "~/venvs/")
   :config
   (pyvenv-mode t)
 
@@ -763,6 +755,16 @@ We don't know what X is."
 )
 
 
+(use-package blacken
+  :straight t
+  :config
+  ;;(add-hook 'python-mode-hook 'blacken-mode)
+  )
+
+
+(use-package py-yapf
+  :straight t
+  )
 
 ;;  EIN - Emacs IPython Notebook
 ;;  Do not use the old repo maintained by tkf,
