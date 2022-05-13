@@ -33,6 +33,13 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 ;;  Emacs Lisp Code
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
+;; Custom tries to put auto-generated code in your init.el
+;; This will prevent that.
+;; https://emacs.stackexchange.com/a/29746
+(setq custom-file "~/.emacs.d/custom.el")
+(load-file custom-file)
+
+
 ;; Bootstrap straight.el
 ;; https://github.com/raxod502/straight.el#getting-started
 (defvar bootstrap-version)
@@ -48,6 +55,7 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+(setq package-enable-at-startup nil)
 ;; M-x straight-check-<package/all>
 ;; M-x straight-rebuild-<package/all>
 ;;
@@ -86,7 +94,6 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 
 (use-package google-this
   :straight t)
-
 
 
 ;;  Shell things
