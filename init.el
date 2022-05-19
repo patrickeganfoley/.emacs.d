@@ -361,6 +361,7 @@ Don't know what ARG does."
 )
 
 (use-package helpful
+  :straight t
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
