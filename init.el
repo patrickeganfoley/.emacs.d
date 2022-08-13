@@ -335,7 +335,16 @@ Don't know what ARG does."
 ;; https://emacs.stackexchange.com/questions/42164/convention-about-using-c-x-or-c-c-as-prefix-keys
 (global-set-key (kbd "C-c z") 'toggle-maximize-buffer)
 
-;; helm/ivy/company autocomplete?
+
+;; Search
+;; helm / ivy/ smex / counsel / swiper
+;; I have no idea how they all work together.
+;; 
+;; ivy - generic completion mechanism
+;; swiper - uses ivy, alternative to isearch
+;; counsel - enhanced versions of common commands
+;; smex/amx - older version of replace search
+
 (use-package ivy
   :straight t
   :config
@@ -353,6 +362,10 @@ Don't know what ARG does."
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
 )
+;; Ivy/counsel by default prepends M-x searches with ^,
+;; which prevents fuzzy matching.
+(setq ivy-initial-inputs-alist nil)
+
 
 (use-package ivy-rich
   :straight t
