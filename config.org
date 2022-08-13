@@ -414,174 +414,21 @@ E is the end."
     (set-marker e nil))
 )
 (global-set-key (kbd "C-c b b") 'bjm-comment-box)
+
+;; https://www.emacswiki.org/emacs/IncrementNumber
+ (defun increment-number-at-point ()
+      (interactive)
+      (skip-chars-backward "0-9")
+      (or (looking-at "[0-9]+")
+          (error "No number at point"))
+      (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+
+
 #+end_src
 
-** Misc / Everything else
+** Org-mode
+
 #+begin_src emacs-lisp
-;; TeX
-(use-package latex-math-preview
-  :straight t)
-
-(use-package which-key
-  :straight t
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 1.5)
-  ;; I can't scroll through the display?
-)
-
-(use-package multiple-cursors
-  :straight t
-  :config ()
-  )
-
-;; Scala
-(use-package scala-mode
-  :straight t
-  :interpreter
-  ("scala" . scala-mode))
-
-;; Golang
-(use-package go-mode
-  :straight t
-  :init
-  (progn
-    (setq gofmt-command "goimports")
-    (add-hook 'before-save-hook 'gofmt-before-save)
-    (bind-key [remap find-tag] #'godef-jump))
-  :config
-  (add-hook 'go-mode-hook 'electric-pair-mode))
-
-
-;;  SQL stuff This is mostly copy pasted from
-;;  https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client
-;;  https://www.emacswiki.org/emacs?action=browse;oldid=Gmail%2c_Gnus_and_GPG_on_a_Mac;id=Gmail%2c_Gnus_and_GPG#toc11
-
-;; I put this here I think to avoid linter errors (assignment to free variable)
-;; But note - you need this _BEFORE_ secrets.el
-(defvar sql-connection-alist)
-(setq sql-connection-alist '() )
-
-;; This contains some sql db locations and passwords
-;; It is not on github.
-(load-file "~/.emacs.d/secrets.el")
-
-(require 'sql)
-(use-package sql
-  :straight t
-  :init (progn
-	  (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
-	  ;; This is great!  You can sort sql results
-	  ;; after they show up if you forgot to in the query!
-	  ;; C-c ^ will sort!
-	  )
-  :hook
-  (sql-mode . enable-sql-upcase)
-  (sql-interactive-mode . enable-sql-upcase)
-
-  :config
-  (define-abbrev-table 'sql-mode-abbrev-table
-    (mapcar #'(lambda (v) (list v (upcase v) nil 1))
-	    '("absolute" "action" "add" "after" "all" "allocate" "alter" "and" "any" "are" "array" "as" "asc" "asensitive" "assertion" "asymmetric" "at" "atomic" "authorization" "avg" "before" "begin" "between" "bigint" "binary" "bit" "bitlength" "blob" "boolean" "both" "breadth" "by" "call" "called" "cascade" "cascaded" "case" "cast" "catalog" "char" "char_length" "character" "character_length" "check" "clob" "close" "coalesce" "collate" "collation" "column" "commit" "condition" "connect" "connection" "constraint" "constraints" "constructor" "contains" "continue" "convert" "corresponding" "count" "create" "cross" "cube" "current" "current_date" "current_default_transform_group" "current_path" "current_role" "current_time" "current_timestamp" "current_transform_group_for_type" "current_user" "cursor" "cycle" "data" "date" "day" "deallocate" "dec" "decimal" "declare" "default" "deferrable" "deferred" "delete" "depth" "deref" "desc" "describe" "descriptor" "deterministic" "diagnostics" "disconnect" "distinct" "do" "domain" "double" "drop" "dynamic" "each" "element" "else" "elseif" "end" "equals" "escape" "except" "exception" "exec" "execute" "exists" "exit" "external" "extract" "false" "fetch" "filter" "first" "float" "for" "foreign" "found" "free" "from" "full" "function" "general" "get" "global" "go" "goto" "grant" "group" "grouping" "handler" "having" "hold" "hour" "identity" "if" "immediate" "in" "indicator" "initially" "inner" "inout" "input" "insensitive" "insert" "int" "integer" "intersect" "interval" "into" "is" "isolation" "iterate" "join" "key" "language" "large" "last" "lateral" "leading" "leave" "left" "level" "like" "limit" "local" "localtime" "localtimestamp" "locator" "loop" "lower" "map" "match" "map" "member" "merge" "method" "min" "minute" "modifies" "module" "month" "multiset" "names" "national" "natural" "nchar" "nclob" "new" "next" "no" "none" "not" "null" "nullif" "numeric" "object" "octet_length" "of" "old" "on" "only" "open" "option" "or" "order" "ordinality" "out" "outer" "output" "over" "overlaps" "pad" "parameter" "partial" "partition" "path" "position" "precision" "prepare" "preserve" "primary" "prior" "privileges" "procedure" "public" "range" "read" "reads" "real" "recursive" "ref" "references" "referencing" "relative" "release" "repeat" "resignal" "restrict" "result" "return" "returns" "revoke" "right" "role" "rollback" "rollup" "routine" "row" "rows" "savepoint" "schema" "scope" "scroll" "search" "second" "section" "select" "sensitive" "session" "session_user" "set" "sets" "signal" "similar" "size" "smallint" "some" "space" "specific" "specifictype" "sql" "sqlcode" "sqlerror" "sqlexception" "sqlstate" "sqlwarning" "start" "state" "static" "submultiset" "substring" "sum" "symmetric" "system" "system_user" "table" "tablesample" "temporary" "then" "time" "timestamp" "timezone_hour" "timezone_minute" "to" "trailing" "transaction" "translate" "translation" "treat" "trigger" "trim" "true" "under" "undo" "union" "unique" "unknown" "unnest" "until" "update" "upper" "usage" "user" "using" "value" "values" "varchar" "varying" "view" "when" "whenever" "where" "while" "window" "with" "within" "without" "work" "write" "year" "zone" "greatest" "least")))
-
-  (defun enable-sql-upcase ()
-    (abbrev-mode 1)
-    ;; Make underscore a word character so that abbrev stops expanding
-    ;; send_count to send_COUNT
-    (modify-syntax-entry ?_ "w" sql-mode-syntax-table))
-
-  )
-
-(add-hook 'sql-interactive-mode-hook
-	  (lambda ()
-	    (toggle-truncate-lines t)))
-
-(defvar sql-postgres-program)
-(setq sql-postgres-program "/usr/local/bin/psql")
-(defvar sql-send-terminator)
-(setq sql-send-terminator t)
-
-;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
-(defvar sql-presto-program)
-(defvar sql-presto-login-params)
-(setq sql-presto-program "sane-presto"
-      sql-presto-login-params '((user :default "patrick")
-				(database :default "")))
-
-(defun sql-presto ()
-  "Connect to presto."
-  (interactive)
-  (let ((sql-product 'presto))
-    (sql-connect 'presto)
-    ))
-
-;; To connect to a local db sqlite db:
-;; M-x sql-sqlite
-;; <name_of_db.db>
-
-(defun sql-comint-presto (product options x)
-  "Interactive connection to presto.
-PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
-We don't know what X is."
-  (let ((sql-login-delay 0.9))
-    (message "%S" product)
-    (message "%S" options)
-    (message "%S" x)
-    (sql-comint product options)))
-
-(defun set-sql-buffer ()
-  "Point to *SQL*."
-  (interactive)
-  (setq sql-buffer "*SQL*"))
-
-(global-set-key (kbd "C-c q") 'set-sql-bufer)
-
-
-
-;; Fonts
-;; I want orgmode and markdowns to use variable width fonts.
-;; Use variable width font faces in current buffer
-;;  This line just declares a variable that apparently
-;;  is defined in some other package.
-;;  See https://emacs.stackexchange.com/questions/21245/dealing-with-warning-assignment-to-free-variable-when-certain-libraries-can-b for why it' necessary.
-(defvar buffer-face-mode-face)
-(defun variable-font-buffer ()
-  "Set font to a variable width (proportional) fonts in current buffer.  Taken from https://emacs.stackexchange.com/a/3044."
-  (interactive)
-  (setq buffer-face-mode-face '(
-				:family "Times New Roman"
-				:height 200
-				))
-  (buffer-face-mode)
-  )
-
-
-(use-package markdown-mode
-  :straight t
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-	 ("readme\\.md\\'" . gfm-mode)
-	 ("\\.md\\'"       . markdown-mode)
-	 ("\\.markdown\\'" . markdown-mode))
-  :init (progn
-	  (setq markdown-command "multimarkdown")
-	  ;; I don't think the variable-font-buffer part works.
-	  (add-hook 'markdown-mode-hook 'variable-font-buffer)
-	  (add-hook 'gfm-mode-hook 'variable-font-buffer)
-	  )
-  )
-
-
-(use-package vmd-mode
-  ;;  You also need to install vmd
-  ;;  You set up nodejs 14.17.5 with asdf
-  :straight t
-  )
-
-;;  Org Mode stuff org-mode org .org orgmode
-;;  Don't use use-package, it's already in
-;;  vanilla emacs.
 (require 'ox-md nil t)
 
 (setq org-hide-emphasis-markers t)
@@ -608,57 +455,35 @@ We don't know what X is."
    org-kanban/prev-keys "tb"
   )
 )
-
- ;; (let* ((variable-tuple
- ;;          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
- ;;                ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
- ;;                ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
- ;;                ((x-list-fonts "Verdana")         '(:font "Verdana"))
- ;;                ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
- ;;                (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
- ;;         (base-font-color     (face-foreground 'default nil 'default))
- ;;         (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
-    ;; (custom-theme-set-faces
-    ;;  'user
-    ;;  `(org-level-8 ((t (,@headline ,@variable-tuple))))
-    ;;  `(org-level-7 ((t (,@headline ,@variable-tuple))))
-    ;;  `(org-level-6 ((t (,@headline ,@variable-tuple))))
-    ;;  `(org-level-5 ((t (,@headline ,@variable-tuple))))
-    ;;  `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-    ;;  `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
-    ;;  `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
-    ;;  `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
-    ;;  `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
-
-
-;; R Rlang R ESS
-(use-package ess
+#+end_src
+** Markdown
+#+begin_src emacs-lisp
+(use-package markdown-mode
   :straight t
-  :mode (
-	 ("\\.r\\'" . r-mode)
-	 ("\\.R\\'" . r-mode)
-	 )
-  :init (require 'ess-r-mode)
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+	 ("readme\\.md\\'" . gfm-mode)
+	 ("\\.md\\'"       . markdown-mode)
+	 ("\\.markdown\\'" . markdown-mode))
+  :init (progn
+	  (setq markdown-command "multimarkdown")
+	  ;; I don't think the variable-font-buffer part works.
+	  (add-hook 'markdown-mode-hook 'variable-font-buffer)
+	  (add-hook 'gfm-mode-hook 'variable-font-buffer)
+	  )
   )
 
-(use-package polymode
-  :straight t
-  :commands (poly-markdown+r-mode)
-  :mode (("\\.rmd\\'" . poly-markdown+r-mode)
-	 ("\\.Rmd\\'" . poly-markdown+r-mode))
-  )
 
-(use-package poly-markdown
-  :straight t
-  :mode (
-	 ("\\.md\\'" . poly-markdown-mode)
-	 )
-  )
-
-(use-package poly-R
+(use-package vmd-mode
+  ;;  You also need to install vmd
+  ;;  You set up nodejs 14.17.5 with asdf
   :straight t
   )
 
+#+end_src
+** Python
+
+#+begin_src emacs-lisp
 ;; Let me try to redo my python setup to use lsp-mode.
 ;; I'm following https://ianyepan.github.io/posts/emacs-ide/ and https://github.com/emacs-lsp/lsp-pyright
 ;; I'd also like to do this for R so my emacs stops crashing.
@@ -771,6 +596,187 @@ We don't know what X is."
 	ein:jupyter-server-args (list "--no-browser")))
 
 
+
+#+end_src
+
+** R
+#+begin_src emacs-lisp
+;; R Rlang R ESS
+(use-package ess
+  :straight t
+  :mode (
+	 ("\\.r\\'" . r-mode)
+	 ("\\.R\\'" . r-mode)
+	 )
+  :init (require 'ess-r-mode)
+  )
+
+(use-package polymode
+  :straight t
+  :commands (poly-markdown+r-mode)
+  :mode (("\\.rmd\\'" . poly-markdown+r-mode)
+	 ("\\.Rmd\\'" . poly-markdown+r-mode))
+  )
+
+(use-package poly-markdown
+  :straight t
+  :mode (
+	 ("\\.md\\'" . poly-markdown-mode)
+	 )
+  )
+
+(use-package poly-R
+  :straight t
+  )
+
+#+end_src
+** SQL
+
+This is all based off https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client
+
+
+#+begin_src emacs-lisp
+;; I put this here I think to avoid linter errors (assignment to free variable)
+;; But note - you need this _BEFORE_ secrets.el
+(defvar sql-connection-alist)
+(setq sql-connection-alist '() )
+
+;; This contains some sql db locations and passwords
+;; It is not on github.
+(load-file "~/.emacs.d/secrets.el")
+
+(require 'sql)
+(use-package sql
+  :straight t
+  :init (progn
+	  (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
+	  ;; This is great!  You can sort sql results
+	  ;; after they show up if you forgot to in the query!
+	  ;; C-c ^ will sort!
+	  )
+  :hook
+  (sql-mode . enable-sql-upcase)
+  (sql-interactive-mode . enable-sql-upcase)
+
+  :config
+  (define-abbrev-table 'sql-mode-abbrev-table
+    (mapcar #'(lambda (v) (list v (upcase v) nil 1))
+	    '("absolute" "action" "add" "after" "all" "allocate" "alter" "and" "any" "are" "array" "as" "asc" "asensitive" "assertion" "asymmetric" "at" "atomic" "authorization" "avg" "before" "begin" "between" "bigint" "binary" "bit" "bitlength" "blob" "boolean" "both" "breadth" "by" "call" "called" "cascade" "cascaded" "case" "cast" "catalog" "char" "char_length" "character" "character_length" "check" "clob" "close" "coalesce" "collate" "collation" "column" "commit" "condition" "connect" "connection" "constraint" "constraints" "constructor" "contains" "continue" "convert" "corresponding" "count" "create" "cross" "cube" "current" "current_date" "current_default_transform_group" "current_path" "current_role" "current_time" "current_timestamp" "current_transform_group_for_type" "current_user" "cursor" "cycle" "data" "date" "day" "deallocate" "dec" "decimal" "declare" "default" "deferrable" "deferred" "delete" "depth" "deref" "desc" "describe" "descriptor" "deterministic" "diagnostics" "disconnect" "distinct" "do" "domain" "double" "drop" "dynamic" "each" "element" "else" "elseif" "end" "equals" "escape" "except" "exception" "exec" "execute" "exists" "exit" "external" "extract" "false" "fetch" "filter" "first" "float" "for" "foreign" "found" "free" "from" "full" "function" "general" "get" "global" "go" "goto" "grant" "group" "grouping" "handler" "having" "hold" "hour" "identity" "if" "immediate" "in" "indicator" "initially" "inner" "inout" "input" "insensitive" "insert" "int" "integer" "intersect" "interval" "into" "is" "isolation" "iterate" "join" "key" "language" "large" "last" "lateral" "leading" "leave" "left" "level" "like" "limit" "local" "localtime" "localtimestamp" "locator" "loop" "lower" "map" "match" "map" "member" "merge" "method" "min" "minute" "modifies" "module" "month" "multiset" "names" "national" "natural" "nchar" "nclob" "new" "next" "no" "none" "not" "null" "nullif" "numeric" "object" "octet_length" "of" "old" "on" "only" "open" "option" "or" "order" "ordinality" "out" "outer" "output" "over" "overlaps" "pad" "parameter" "partial" "partition" "path" "position" "precision" "prepare" "preserve" "primary" "prior" "privileges" "procedure" "public" "range" "read" "reads" "real" "recursive" "ref" "references" "referencing" "relative" "release" "repeat" "resignal" "restrict" "result" "return" "returns" "revoke" "right" "role" "rollback" "rollup" "routine" "row" "rows" "savepoint" "schema" "scope" "scroll" "search" "second" "section" "select" "sensitive" "session" "session_user" "set" "sets" "signal" "similar" "size" "smallint" "some" "space" "specific" "specifictype" "sql" "sqlcode" "sqlerror" "sqlexception" "sqlstate" "sqlwarning" "start" "state" "static" "submultiset" "substring" "sum" "symmetric" "system" "system_user" "table" "tablesample" "temporary" "then" "time" "timestamp" "timezone_hour" "timezone_minute" "to" "trailing" "transaction" "translate" "translation" "treat" "trigger" "trim" "true" "under" "undo" "union" "unique" "unknown" "unnest" "until" "update" "upper" "usage" "user" "using" "value" "values" "varchar" "varying" "view" "when" "whenever" "where" "while" "window" "with" "within" "without" "work" "write" "year" "zone" "greatest" "least")))
+
+  (defun enable-sql-upcase ()
+    (abbrev-mode 1)
+    ;; Make underscore a word character so that abbrev stops expanding
+    ;; send_count to send_COUNT
+    (modify-syntax-entry ?_ "w" sql-mode-syntax-table))
+
+  )
+
+(add-hook 'sql-interactive-mode-hook
+	  (lambda ()
+	    (toggle-truncate-lines t)))
+
+(defvar sql-postgres-program)
+(setq sql-postgres-program "/usr/local/bin/psql")
+(defvar sql-send-terminator)
+(setq sql-send-terminator t)
+
+;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
+(defvar sql-presto-program)
+(defvar sql-presto-login-params)
+(setq sql-presto-program "sane-presto"
+      sql-presto-login-params '((user :default "patrick")
+				(database :default "")))
+
+(defun sql-presto ()
+  "Connect to presto."
+  (interactive)
+  (let ((sql-product 'presto))
+    (sql-connect 'presto)
+    ))
+
+;; To connect to a local db sqlite db:
+;; M-x sql-sqlite
+;; <name_of_db.db>
+
+(defun sql-comint-presto (product options x)
+  "Interactive connection to presto.
+PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
+We don't know what X is."
+  (let ((sql-login-delay 0.9))
+    (message "%S" product)
+    (message "%S" options)
+    (message "%S" x)
+    (sql-comint product options)))
+
+(defun set-sql-buffer ()
+  "Point to *SQL*."
+  (interactive)
+  (setq sql-buffer "*SQL*"))
+
+(global-set-key (kbd "C-c q") 'set-sql-bufer)
+
+#+end_src
+
+** Other Languages
+
+#+begin_src emacs-lisp
+;; Scala
+(use-package scala-mode
+  :straight t
+  :interpreter
+  ("scala" . scala-mode))
+
+;; Golang
+(use-package go-mode
+  :straight t
+  :init
+  (progn
+    (setq gofmt-command "goimports")
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (bind-key [remap find-tag] #'godef-jump))
+  :config
+  (add-hook 'go-mode-hook 'electric-pair-mode))
+#+end_src
+
+** Misc / Everything else
+#+begin_src emacs-lisp
+;; TeX
+(use-package latex-math-preview
+  :straight t)
+
+(use-package which-key
+  :straight t
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 1.5)
+  ;; I can't scroll through the display?
+)
+
+(use-package multiple-cursors
+  :straight t
+  :config ()
+  )
+
+
+;; Fonts
+;; I want orgmode and markdowns to use variable width fonts.
+;; Use variable width font faces in current buffer
+;;  This line just declares a variable that apparently
+;;  is defined in some other package.
+;;  See https://emacs.stackexchange.com/questions/21245/dealing-with-warning-assignment-to-free-variable-when-certain-libraries-can-b for why it' necessary.
+(defvar buffer-face-mode-face)
+(defun variable-font-buffer ()
+  "Set font to a variable width (proportional) fonts in current buffer.  Taken from https://emacs.stackexchange.com/a/3044."
+  (interactive)
+  (setq buffer-face-mode-face '(
+				:family "Times New Roman"
+				:height 200
+				))
+  (buffer-face-mode)
+  )
+
+
 ;;  Does this have to come after rmode?
 (use-package restclient
   :straight t
@@ -863,15 +869,10 @@ Version 2015-07-30
 (global-set-key (kbd "C-c C-f") 'beautify-json)
 
 
-;; https://www.emacswiki.org/emacs/IncrementNumber
- (defun increment-number-at-point ()
-      (interactive)
-      (skip-chars-backward "0-9")
-      (or (looking-at "[0-9]+")
-          (error "No number at point"))
-      (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
+#+end_src
 
+
+#+begin_src emacs-lisp
 (provide 'init)
 ;;; init.el ends here
-
 #+end_src
