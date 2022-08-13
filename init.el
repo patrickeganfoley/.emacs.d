@@ -163,7 +163,7 @@ VALUE from 0 = transparent, 100 = opaque"
 ;; Themes
 (use-package doom-themes
   :straight t
-  :init (load-theme 'doom-monokai-classic)
+  :init (load-theme 'doom-solarized-light)
 )
 
 (use-package cycle-themes
