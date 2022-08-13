@@ -1,3 +1,25 @@
+* Contents :TOC_3_gh:
+- [[#emacs-config][Emacs Config]]
+  - [[#custom][Custom]]
+  - [[#package-bootstrapping][Package Bootstrapping]]
+  - [[#basic-ui][Basic UI]]
+  - [[#path-things--osx][Path Things / OSX]]
+  - [[#themes][Themes]]
+  - [[#magit][Magit]]
+  - [[#buffer--window-navigation][Buffer / Window Navigation]]
+  - [[#search--ivy--counsel][Search / Ivy / Counsel]]
+  - [[#autocomplete][Autocomplete]]
+  - [[#linters][Linters]]
+  - [[#generic-editing][Generic Editing]]
+  - [[#org-mode][Org-mode]]
+  - [[#markdown][Markdown]]
+  - [[#python][Python]]
+  - [[#r][R]]
+  - [[#sql][SQL]]
+  - [[#other-languages][Other Languages]]
+  - [[#misc--everything-else][Misc / Everything else]]
+- [[#basic-orgmode][Basic Orgmode]]
+
 * Emacs Config
 
 Reload the config with ~load-init~.
