@@ -435,31 +435,37 @@ E is the end."
 ** Org-mode
 
 #+begin_src emacs-lisp
-(require 'ox-md nil t)
+  (require 'ox-md nil t)
 
-(setq org-hide-emphasis-markers t)
+  (setq org-hide-emphasis-markers t)
 
-(add-hook 'org-mode-hook 'org-indent-mode)
-;; (add-hook 'org-mode-hook 'variable-pitch-mode)
-(add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'org-indent-mode)
+  ;; (add-hook 'org-mode-hook 'variable-pitch-mode)
+  (add-hook 'org-mode-hook 'visual-line-mode)
 
-;; Don't add new lines
-(setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
+  ;; Don't add new lines
+  (setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
 
-;; subscripts/superscripts 
-;; https://orgmode.org/manual/Subscripts-and-Superscripts.html#Subscripts-and-Superscripts
-(setq org-pretty-entities t)
-(setq org-pretty-entities-include-sub-superscripts t)
+  ;; subscripts/superscripts 
+  ;; https://orgmode.org/manual/Subscripts-and-Superscripts.html#Subscripts-and-Superscripts
+  (setq org-pretty-entities t)
+  (setq org-pretty-entities-include-sub-superscripts t)
 
-;; kanban
-(use-package org-kanban
-  :straight t
-  :config 
-  (setq
-   org-kanban/layout '("..." . 24)
-   org-kanban/next-keys "tf"
-   org-kanban/prev-keys "tb"
+  ;; kanban
+  (use-package org-kanban
+    :straight t
+    :config 
+    (setq
+     org-kanban/layout '("..." . 24)
+     org-kanban/next-keys "tf"
+     org-kanban/prev-keys "tb"
+    )
   )
+
+(use-package toc-org
+  :straight t
+  :after org
+  :init (add-hook 'org-mode-hook #'toc-org-enable)
 )
 #+end_src
 ** Markdown
