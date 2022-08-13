@@ -1,36 +1,17 @@
+* Emacs Config
+
+Reload the config with ~load-init~.
+
 #+begin_src emacs-lisp
-;;; init.el
+(defun load-init ()
+  "Reload the init file.  I am learning how to write elisp."
+  (interactive) ;; Do I need this for everything??
+  (message "Reloading init.el...")
+  (load-file "~/.emacs.d/init.el"))
+#+end_src
 
-;; replacing the brew tap railwaycat/emacs-mac; brew install emacs-mac version i with https://emacsformacosx.com/
-(setq mac-command-modifier 'meta ;; I want this to do nothing.
-      mac-option-modifier 'meta)
-
-;;  emacs-mac also has slightly different fullscreen support.
-;;  https://github.com/joostkremers/writeroom-mode/issues/34
-;;  You can get fullscren by calling M-x toggle-frame-fullscreen
-(defun set-frame-width-interactive (arg)
-  "Interactively set frame width.
-ARG
-Taken from https://stackoverflow.com/a/644950.
-Use like this:  `C-u 80 M-x set-frame-width-interactive`."
-   (interactive "p")
-   (set-frame-width (selected-frame) arg))
-
-;;; Code:
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-(electric-indent-mode -1)
-(set-fringe-mode 10)  ;; size of margins in pixels
-
-
-;; Always make tabs into spaces
-(setq-default indent-tabs-mode nil)
-
-(set-frame-font "Menlo 24")
-
-
-;;  Emacs Lisp Code
+** Custom 
+#+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 ;; Custom tries to put auto-generated code in your init.el
@@ -38,8 +19,9 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 ;; https://emacs.stackexchange.com/a/29746
 (setq custom-file "~/.emacs.d/custom.el")
 (load-file custom-file)
-
-
+#+end_src
+** Package Bootstrapping
+#+begin_src emacs-lisp
 ;; Bootstrap straight.el
 ;; https://github.com/raxod502/straight.el#getting-started
 (defvar bootstrap-version)
@@ -61,17 +43,27 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 ;;
 ;; Set straight-check-for-modifications to nil before the bootstrap if
 ;; you don't want straight to do automatic updating.
-
-
 (straight-use-package 'use-package)
+#+end_src
 
-;; Custom tries to put auto-generated code in your init.el
-;; This will prevent that.
-;; https://emacs.stackexchange.com/a/29746
-(setq custom-file "~/.emacs.d/custom.el")
-(load-file custom-file)
+** Basic UI
+
+#+begin_src emacs-lisp
+(setq mac-command-modifier 'meta ;; I want this to do nothing.
+      mac-option-modifier 'meta)
+
+;;; Code:
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(electric-indent-mode -1)
+(set-fringe-mode 10)  ;; size of margins in pixels
 
 
+;; Always make tabs into spaces
+(setq-default indent-tabs-mode nil)
+
+(set-frame-font "Menlo 24")
 
 (use-package command-log-mode
   :straight t
@@ -92,10 +84,20 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
   ;;  why does this not set at startup?
 )
 
-(use-package google-this
-  :straight t)
+;;  Appearance
+(defun transparency (value)
+  "Set the transparency of the frame window.
+VALUE from 0 = transparent, 100 = opaque"
+  (interactive "nTransparency Value 0 - 100 opaque:")
+  (set-frame-parameter (selected-frame) 'alpha value))
 
-
+(use-package rainbow-delimiters
+  :straight t
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+#+end_src
+** Path Things / OSX
+#+begin_src emacs-lisp
 ;;  Shell things
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
@@ -110,56 +112,61 @@ Use like this:  `C-u 80 M-x set-frame-width-interactive`."
 (setenv "SHELL" shell-file-name)
 (setenv "ESHELL" shell-file-name)
 
-(use-package osx-browse
-  :straight t)
-;; This provides lisp functions to
-;; open safari.
-;; It's necessary for things like browse-at-remote.
 
+
+#+end_src
+
+Web stuff.  I removed osx-browse, which I used to use to set up safari.
+
+#+begin_src emacs-lisp
 (use-package browse-at-remote
   :straight t
   :bind ("C-c g g" . browse-at-remote)
-  :config (progn
-	    (setq browse-url-browser-function 'osx-browse-url-safari)
-	    (setq browse-url-browser-function 'osx-browse-url-safari)
-	    (setq browse-url-browser-function 'osx-browse-url-safari))
 )
 
-
-;; TeX
-(use-package latex-math-preview
+(use-package google-this
   :straight t)
+#+end_src
 
-;; This is me trying to learn lisp
-(defun load-init ()
-  "Reload the init file.  I am learning how to write elisp."
-  (interactive) ;; Do I need this for everything??
-  (message "Reloading init.el...")
-  (load-file "~/.emacs.d/init.el"))
+OSX copy/paste
 
-;; Trying to define a function.  I made these two
-;; with Macros, but I have no idea what they mean.
-;; I'd like to change this so it
-;;   1.  Will use single if I put single, double if double
-;;   2.  Is toggle-able or can be undone with a similar function
-(fset 'quotify
-      (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote (" \"\342\346 \"" 0 "%d")) arg)))
-(global-set-key (kbd "M-'") 'quotify)
-(global-set-key (kbd "M-\"") 'quotify)
-;; Neat!  this worked!!
+#+begin_src emacs-lisp
+;; Copy-Paste
+;; This let's me copy and paste w/ OSX
+(setq select-enable-clipboard t)
 
-(fset 'spacify
-      (lambda (&optional arg) "Keyboard macro." (interactive "p") (kmacro-exec-ring-item (quote ("  " 0 "%d")) arg)))
-(global-set-key (kbd "M-<SPC>") 'spacify)
+(defun copy-to-clipboard ()
+  "Copy like OSX."
+  (interactive)
+  (if (display-graphic-p)
+      (progn
+	(message "Yanked region to x-clipboard!")
+	(call-interactively 'clipboard-kill-ring-save)
+	)
+    (if (region-active-p)
+	(progn
+	  (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+	  (message "Yanked region to clipboard!")
+	  (deactivate-mark))
+      (message "No region active; can't yank to clipboard!")))
+  )
 
-;;  Appearance
-(defun transparency (value)
-  "Set the transparency of the frame window.
-VALUE from 0 = transparent, 100 = opaque"
-  (interactive "nTransparency Value 0 - 100 opaque:")
-  (set-frame-parameter (selected-frame) 'alpha value))
+(defun paste-from-clipboard ()
+  "Paste like  OSX."
+  (interactive)
+  (if (display-graphic-p)
+      (progn
+	(clipboard-yank)
+	(message "graphics active")
+	)
+    (insert (shell-command-to-string "xsel -o -b"))
+    )
+  )
+#+end_src
 
+** Themes
 
+#+begin_src emacs-lisp
 ;; Themes
 (use-package doom-themes
   :straight t
@@ -182,31 +189,10 @@ VALUE from 0 = transparent, 100 = opaque"
               )
   )
 
-;; (load-theme 'monokai t)
 
-(use-package rainbow-delimiters
-  ;; I can't see what's going on in lisp code.
-  ;; Maybe this will help.
-  :straight t
-  :hook (prog-mode . rainbow-delimiters-mode)
-  )
-
-(use-package which-key
-  :straight t
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 1.5)
-  ;; I can't scroll through the display?
-)
-
-
-
-(use-package multiple-cursors
-  :straight t
-  :config ()
-  )
-
+#+end_src
+** Magit
+#+begin_src emacs-lisp
 (use-package magit
   :straight t
   :bind (("C-x g" . magit-status))
@@ -235,51 +221,9 @@ VALUE from 0 = transparent, 100 = opaque"
 (use-package transient
   :straight t
   )
-
-					; Original idea from
-;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
-(defun comment-dwim-line (&optional arg)
-  "Replacement for the `comment-dwim' command.
-If no region is selected and current line is not blank and we are
-  not at the end of the line, then comment current line.
-  Replaces default behaviour of `comment-dwim', when it inserts
-  comment at the end of the line.
-  ARG is passed to `comment-normalize-vars'"
-  (interactive "*P")
-  (comment-normalize-vars)
-  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
-      (comment-or-uncomment-region (line-beginning-position) (line-end-position))
-    (comment-dwim arg)))
-(global-set-key "\M-;" 'comment-dwim-line)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Full width comment box                                                 ;;
-;; from http://irreal.org/blog/?p=374                                     ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun bjm-comment-box (b e)
-  "Draw a comment box.
-Pulled from http://www.star.bris.ac.uk/bjm/emacs-tips.html.
-B is beginning of the box.
-E is the end."
-
-  (interactive "r")
-
-  (let ((e (copy-marker e t)))
-    (goto-char b)
-    (end-of-line)
-    (insert-char ?  (- fill-column (current-column)))
-    (comment-box b e 1)
-    (goto-char e)
-    (set-marker e nil))
-)
-(global-set-key (kbd "C-c b b") 'bjm-comment-box)
-
-
-;; Window / Buffer navigation stuff
-
-;; Windowing
-;;  (for multiple monitors)
+#+end_src
+** Buffer / Window Navigation
+#+begin_src emacs-lisp
 (global-set-key (kbd "C-x o") 'next-multiframe-window)
 
 ;; http://stackoverflow.com/a/17984479
@@ -335,16 +279,15 @@ Don't know what ARG does."
 ;; https://emacs.stackexchange.com/questions/42164/convention-about-using-c-x-or-c-c-as-prefix-keys
 (global-set-key (kbd "C-c z") 'toggle-maximize-buffer)
 
+#+end_src
+** Search / Ivy / Counsel
 
-;; Search
-;; helm / ivy/ smex / counsel / swiper
-;; I have no idea how they all work together.
-;; 
-;; ivy - generic completion mechanism
-;; swiper - uses ivy, alternative to isearch
-;; counsel - enhanced versions of common commands
-;; smex/amx - older version of replace search
+ivy - generic completion mechanism
+swiper - uses ivy, alternative to isearch
+counsel - enhanced versions of common commands
+smex/amx - older version of replace search
 
+#+begin_src emacs-lisp
 (use-package ivy
   :straight t
   :config
@@ -385,24 +328,15 @@ Don't know what ARG does."
   ([remap describe-key] . helpful-key)
 
 )
+#+end_src
+** Autocomplete
+The major autocompletion tools are company mode and auto-complete. company-mode is more actively maintained and has a better API for
+plugins.  You will need to install plugins for different languages just like you install different backends for syntax checking with
+flycheck.
 
-;;  Autocomplete
-;;  The major autocompletion tools are company mode and
-;;  auto-complete.  company-mode is more actively maintained
-;;  and has a better API for plugins.  You will need
-;;  to install plugins for different languages just like
-;;  you install different backends for syntax checking with
-;;  flycheck.
-;;
+Python has two major auto complete backends that work with company: jedi and rope.  rope is more about refactoring.
 
-;;
-;;  Python has two major auto complete backends that work
-;;  with company: jedi and rope.  rope is more about
-;;  refactoring.
-;;  You need to install jedi and etc with pip.
-;;
-;;  I disable company-mode in eshell and org-mode,
-;;  otherwise it messes with the asteriskses.
+#+begin_src emacs-lisp
 (use-package company
   :straight t
   :diminish company-mode
@@ -414,30 +348,93 @@ Don't know what ARG does."
   ;; ("<tab>" . company-complete-common)
   ;;:config
   )
+#+end_src
 
+I disable company in org-mode and shell, otherwise it messes with all the asteriskses. 
+** Linters
+Flycheck is syntax checking specifically for emacs - it does not check syntax itself, but calls external programs.
+flymake is the built-in version of syntax checking.
 
-;;  Syntax Checking
-;;    *  Flycheck is syntax checking specifically for emacs.
-;;    *  flymake is the built-in version of syntax checking.
-;;    *  flycheck does not check syntax itself, but calls
-;;       external programs you need to install.
+#+begin_src emacs-lisp
 (use-package flycheck
   :straight t
   :init (global-flycheck-mode)
   ;; Use C-c ! v to check out flycheck settings
   ;; Use C-c ! n to check the next error!
   )
-;; Python has several syntax checkers,
-;;   *  pylint and flake8 are the main ones, and mypy does static type checking.
-;;   *  You can make a config file for a repo with pylint --generate-rcfile > .pylintrc
-;;   *  For flake8, put things in setup.cfg with a [flake8] at the top of the file.
-;;      You will also need to add a .dir_locals.el containing
-;;      ((python-mode . ((flycheck-flake8rc . "setup.cfg"))))
+#+end_src
 
+Python has several syntax checkers, pylint and flake8 are the main ones, and mypy does static type checking.
 
+You can make a config file for a repo with ~pylint --generate-rcfile > .pylintrc~
 
-;;  flycheck uses https://github.com/jimhester/lintr for R
+For flake8, put things in setup.cfg with a [flake8] at the top of the file.
 
+You will also need to add a =.dir_locals.el= containing
+
+~((python-mode . ((flycheck-flake8rc . "setup.cfg"))))~
+
+flycheck uses https://github.com/jimhester/lintr for R
+** Generic Editing
+Tools for block commenting, comment boxes, etc...
+
+I'll try to get a put-in-spaces/quotes/etc.. thing here.
+
+#+begin_src emacs-lisp
+;; Original idea from
+;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
+(defun comment-dwim-line (&optional arg)
+  "Replacement for the `comment-dwim' command.
+If no region is selected and current line is not blank and we are
+  not at the end of the line, then comment current line.
+  Replaces default behaviour of `comment-dwim', when it inserts
+  comment at the end of the line.
+  ARG is passed to `comment-normalize-vars'"
+  (interactive "*P")
+  (comment-normalize-vars)
+  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+      (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+    (comment-dwim arg)))
+(global-set-key "\M-;" 'comment-dwim-line)
+
+(defun bjm-comment-box (b e)
+  "Draw a comment box.
+Pulled from http://www.star.bris.ac.uk/bjm/emacs-tips.html.
+B is beginning of the box.
+E is the end."
+
+  (interactive "r")
+
+  (let ((e (copy-marker e t)))
+    (goto-char b)
+    (end-of-line)
+    (insert-char ?  (- fill-column (current-column)))
+    (comment-box b e 1)
+    (goto-char e)
+    (set-marker e nil))
+)
+(global-set-key (kbd "C-c b b") 'bjm-comment-box)
+#+end_src
+
+** Misc / Everything else
+#+begin_src emacs-lisp
+;; TeX
+(use-package latex-math-preview
+  :straight t)
+
+(use-package which-key
+  :straight t
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 1.5)
+  ;; I can't scroll through the display?
+)
+
+(use-package multiple-cursors
+  :straight t
+  :config ()
+  )
 
 ;; Scala
 (use-package scala-mode
@@ -455,39 +452,6 @@ Don't know what ARG does."
     (bind-key [remap find-tag] #'godef-jump))
   :config
   (add-hook 'go-mode-hook 'electric-pair-mode))
-
-
-;; Copy-Paste
-;; This let's me copy and paste w/ OSX
-(setq select-enable-clipboard t)
-
-(defun copy-to-clipboard ()
-  "Copy like OSX."
-  (interactive)
-  (if (display-graphic-p)
-      (progn
-	(message "Yanked region to x-clipboard!")
-	(call-interactively 'clipboard-kill-ring-save)
-	)
-    (if (region-active-p)
-	(progn
-	  (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
-	  (message "Yanked region to clipboard!")
-	  (deactivate-mark))
-      (message "No region active; can't yank to clipboard!")))
-  )
-
-(defun paste-from-clipboard ()
-  "Paste like  OSX."
-  (interactive)
-  (if (display-graphic-p)
-      (progn
-	(clipboard-yank)
-	(message "graphics active")
-	)
-    (insert (shell-command-to-string "xsel -o -b"))
-    )
-  )
 
 
 ;;  SQL stuff This is mostly copy pasted from
