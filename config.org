@@ -10,6 +10,12 @@ Reload the config with ~load-init~.
   (load-file "~/.emacs.d/init.el"))
 #+end_src
 
+And let's try to open this file on startup.
+
+#+begin_src emacs-lisp
+(setq initial-buffer-choice "~/.emacs.d/config.org")
+#+end_src
+
 ** Custom 
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -520,8 +526,8 @@ E is the end."
                           (require 'lsp-pyright)
                           (lsp)))
   :config
-  (setq lsp-pyright-venv-directory "/Users/patrickfoley/venvs/")
-  (setq lsp-pyright-venv-path "/Users/patrickfoley/venvs/")
+  (setq lsp-pyright-venv-directory "/~/venvs/")
+  (setq lsp-pyright-venv-path "/~/venvs/")
   ;; Note!  See the pyvenv() function!  This determines the python executable!
 )
 
