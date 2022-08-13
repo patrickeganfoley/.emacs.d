@@ -882,3 +882,31 @@ Version 2015-07-30
 (provide 'init)
 ;;; init.el ends here
 #+end_src
+* Basic Orgmode 
+You can use 
+- *bold* with =*bold*=
+- /italics/ with =/italics/=
+- _underlined_ with =_underlined_=
+- =verbatim= with ~=verbatim=~
+- ~code~ with =~code~=
+- +strikethrough+ with =+strikethrough+=
+- note =`= backticks are /not/ part of the org-mode markup language!
+- Lists are =-=, not asteriskses.
+- Change lists' appearance with =C-c -=
+
+Source blocks are made with =C-c C-,= and executed with =C-c C-c=.  
+
+You can use TeX natively like x^2 and it will render if you use 
+
+#+begin_src emacs-lisp
+(setq org-pretty-entities t)
+(setq org-pretty-entities-include-sub-superscripts t)
+#+end_src
+
+You can also use equations and get previews like 
+
+\begin{equation}
+\sigma^{-1}(p_{cs}) = (X_{cf}A^{fk} + \eta_c^k)(Y_{sa}B^a_k + \xi_{sk})
+\end{equation}
+
+That will render if you toggle =org-latex-preview= with =C-c C-x C-l=.  
