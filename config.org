@@ -451,6 +451,23 @@ E is the end."
           (error "No number at point"))
       (replace-match (number-to-string (1+ (string-to-number (match-string 0))))))
 
+(defun xah-replace-invisible-char ()
+  "Query replace some invisible Unicode chars.
+The chars to be searched are:
+ ZERO WIDTH NO-BREAK SPACE (65279, #xfeff)
+ ZERO WIDTH SPACE (codepoint 8203, #x200b)
+ RIGHT-TO-LEFT MARK (8207, #x200f)
+ RIGHT-TO-LEFT OVERRIDE (8238, #x202e)
+ LEFT-TO-RIGHT MARK ‎(8206, #x200e)
+ OBJECT REPLACEMENT CHARACTER (65532, #xfffc)
+
+Search begins at cursor position. (respects `narrow-to-region')
+
+URL `http://xahlee.info/emacs/emacs/elisp_unicode_replace_invisible_chars.html'
+Version 2018-09-07"
+  (interactive)
+  (query-replace-regexp "\ufeff\\|\u200b\\|\u200f\\|\u202e\\|\u200e\\|\ufffc" ""))
+
 
 #+end_src
 
@@ -668,88 +685,112 @@ E is the end."
 
 This is all based off https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client
 
+First some generic sql setup.
 
 #+begin_src emacs-lisp
-;; I put this here I think to avoid linter errors (assignment to free variable)
-;; But note - you need this _BEFORE_ secrets.el
-(defvar sql-connection-alist)
-(setq sql-connection-alist '() )
+    ;; I put this here I think to avoid linter errors (assignment to free variable)
+    ;; But note - you need this _BEFORE_ secrets.el
+    (defvar sql-connection-alist)
+    (setq sql-connection-alist '() )
 
-;; This contains some sql db locations and passwords
-;; It is not on github.
-(load-file "~/.emacs.d/secrets.el")
+    ;; This contains some sql db locations and passwords
+    ;; It is not on github.
+    (load-file "~/.emacs.d/secrets.el")
 
-(require 'sql)
-(use-package sql
-  :straight t
-  :init (progn
-	  (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
-	  ;; This is great!  You can sort sql results
-	  ;; after they show up if you forgot to in the query!
-	  ;; C-c ^ will sort!
-	  )
-  :hook
-  (sql-mode . enable-sql-upcase)
-  (sql-interactive-mode . enable-sql-upcase)
+    (require 'sql)
+    (use-package sql
+      :straight t
+      :init (progn
+              (add-hook 'sql-interactive-mode-hook 'orgtbl-mode)
+              ;; This is great!  You can sort sql results
+              ;; after they show up if you forgot to in the query!
+              ;; C-c ^ will sort!
+              )
+      :hook
+      (sql-mode . enable-sql-upcase)
+      (sql-interactive-mode . enable-sql-upcase)
 
-  :config
-  (define-abbrev-table 'sql-mode-abbrev-table
-    (mapcar #'(lambda (v) (list v (upcase v) nil 1))
-	    '("absolute" "action" "add" "after" "all" "allocate" "alter" "and" "any" "are" "array" "as" "asc" "asensitive" "assertion" "asymmetric" "at" "atomic" "authorization" "avg" "before" "begin" "between" "bigint" "binary" "bit" "bitlength" "blob" "boolean" "both" "breadth" "by" "call" "called" "cascade" "cascaded" "case" "cast" "catalog" "char" "char_length" "character" "character_length" "check" "clob" "close" "coalesce" "collate" "collation" "column" "commit" "condition" "connect" "connection" "constraint" "constraints" "constructor" "contains" "continue" "convert" "corresponding" "count" "create" "cross" "cube" "current" "current_date" "current_default_transform_group" "current_path" "current_role" "current_time" "current_timestamp" "current_transform_group_for_type" "current_user" "cursor" "cycle" "data" "date" "day" "deallocate" "dec" "decimal" "declare" "default" "deferrable" "deferred" "delete" "depth" "deref" "desc" "describe" "descriptor" "deterministic" "diagnostics" "disconnect" "distinct" "do" "domain" "double" "drop" "dynamic" "each" "element" "else" "elseif" "end" "equals" "escape" "except" "exception" "exec" "execute" "exists" "exit" "external" "extract" "false" "fetch" "filter" "first" "float" "for" "foreign" "found" "free" "from" "full" "function" "general" "get" "global" "go" "goto" "grant" "group" "grouping" "handler" "having" "hold" "hour" "identity" "if" "immediate" "in" "indicator" "initially" "inner" "inout" "input" "insensitive" "insert" "int" "integer" "intersect" "interval" "into" "is" "isolation" "iterate" "join" "key" "language" "large" "last" "lateral" "leading" "leave" "left" "level" "like" "limit" "local" "localtime" "localtimestamp" "locator" "loop" "lower" "map" "match" "map" "member" "merge" "method" "min" "minute" "modifies" "module" "month" "multiset" "names" "national" "natural" "nchar" "nclob" "new" "next" "no" "none" "not" "null" "nullif" "numeric" "object" "octet_length" "of" "old" "on" "only" "open" "option" "or" "order" "ordinality" "out" "outer" "output" "over" "overlaps" "pad" "parameter" "partial" "partition" "path" "position" "precision" "prepare" "preserve" "primary" "prior" "privileges" "procedure" "public" "range" "read" "reads" "real" "recursive" "ref" "references" "referencing" "relative" "release" "repeat" "resignal" "restrict" "result" "return" "returns" "revoke" "right" "role" "rollback" "rollup" "routine" "row" "rows" "savepoint" "schema" "scope" "scroll" "search" "second" "section" "select" "sensitive" "session" "session_user" "set" "sets" "signal" "similar" "size" "smallint" "some" "space" "specific" "specifictype" "sql" "sqlcode" "sqlerror" "sqlexception" "sqlstate" "sqlwarning" "start" "state" "static" "submultiset" "substring" "sum" "symmetric" "system" "system_user" "table" "tablesample" "temporary" "then" "time" "timestamp" "timezone_hour" "timezone_minute" "to" "trailing" "transaction" "translate" "translation" "treat" "trigger" "trim" "true" "under" "undo" "union" "unique" "unknown" "unnest" "until" "update" "upper" "usage" "user" "using" "value" "values" "varchar" "varying" "view" "when" "whenever" "where" "while" "window" "with" "within" "without" "work" "write" "year" "zone" "greatest" "least")))
+      :config
+      (define-abbrev-table 'sql-mode-abbrev-table
+        (mapcar #'(lambda (v) (list v (upcase v) nil 1))
+                '("absolute" "action" "add" "after" "all" "allocate" "alter" "and" "any" "are" "array" "as" "asc" "asensitive" "assertion" "asymmetric" "at" "atomic" "authorization" "avg" "before" "begin" "between" "bigint" "binary" "bit" "bitlength" "blob" "boolean" "both" "breadth" "by" "call" "called" "cascade" "cascaded" "case" "cast" "catalog" "char" "char_length" "character" "character_length" "check" "clob" "close" "coalesce" "collate" "collation" "column" "commit" "condition" "connect" "connection" "constraint" "constraints" "constructor" "contains" "continue" "convert" "corresponding" "count" "create" "cross" "cube" "current" "current_date" "current_default_transform_group" "current_path" "current_role" "current_time" "current_timestamp" "current_transform_group_for_type" "current_user" "cursor" "cycle" "data" "date" "day" "deallocate" "dec" "decimal" "declare" "default" "deferrable" "deferred" "delete" "depth" "deref" "desc" "describe" "descriptor" "deterministic" "diagnostics" "disconnect" "distinct" "do" "domain" "double" "drop" "dynamic" "each" "element" "else" "elseif" "end" "equals" "escape" "except" "exception" "exec" "execute" "exists" "exit" "external" "extract" "false" "fetch" "filter" "first" "float" "for" "foreign" "found" "free" "from" "full" "function" "general" "get" "global" "go" "goto" "grant" "group" "grouping" "handler" "having" "hold" "hour" "identity" "if" "immediate" "in" "indicator" "initially" "inner" "inout" "input" "insensitive" "insert" "int" "integer" "intersect" "interval" "into" "is" "isolation" "iterate" "join" "key" "language" "large" "last" "lateral" "leading" "leave" "left" "level" "like" "limit" "local" "localtime" "localtimestamp" "locator" "loop" "lower" "map" "match" "map" "member" "merge" "method" "min" "minute" "modifies" "module" "month" "multiset" "names" "national" "natural" "nchar" "nclob" "new" "next" "no" "none" "not" "null" "nullif" "numeric" "object" "octet_length" "of" "old" "on" "only" "open" "option" "or" "order" "ordinality" "out" "outer" "output" "over" "overlaps" "pad" "parameter" "partial" "partition" "path" "position" "precision" "prepare" "preserve" "primary" "prior" "privileges" "procedure" "public" "range" "read" "reads" "real" "recursive" "ref" "references" "referencing" "relative" "release" "repeat" "resignal" "restrict" "result" "return" "returns" "revoke" "right" "role" "rollback" "rollup" "routine" "row" "rows" "savepoint" "schema" "scope" "scroll" "search" "second" "section" "select" "sensitive" "session" "session_user" "set" "sets" "signal" "similar" "size" "smallint" "some" "space" "specific" "specifictype" "sql" "sqlcode" "sqlerror" "sqlexception" "sqlstate" "sqlwarning" "start" "state" "static" "submultiset" "substring" "sum" "symmetric" "system" "system_user" "table" "tablesample" "temporary" "then" "time" "timestamp" "timezone_hour" "timezone_minute" "to" "trailing" "transaction" "translate" "translation" "treat" "trigger" "trim" "true" "under" "undo" "union" "unique" "unknown" "unnest" "until" "update" "upper" "usage" "user" "using" "value" "values" "varchar" "varying" "view" "when" "whenever" "where" "while" "window" "with" "within" "without" "work" "write" "year" "zone" "greatest" "least")))
 
-  (defun enable-sql-upcase ()
-    (abbrev-mode 1)
-    ;; Make underscore a word character so that abbrev stops expanding
-    ;; send_count to send_COUNT
-    (modify-syntax-entry ?_ "w" sql-mode-syntax-table))
+      (defun enable-sql-upcase ()
+        (abbrev-mode 1)
+        ;; Make underscore a word character so that abbrev stops expanding
+        ;; send_count to send_COUNT
+        (modify-syntax-entry ?_ "w" sql-mode-syntax-table))
 
-  )
+      )
 
-(add-hook 'sql-interactive-mode-hook
-	  (lambda ()
-	    (toggle-truncate-lines t)))
+    (add-hook 'sql-interactive-mode-hook
+              (lambda ()
+                (toggle-truncate-lines t)))
+#+end_src 
 
-(defvar sql-postgres-program)
-(setq sql-postgres-program "/usr/local/bin/psql")
-(defvar sql-send-terminator)
-(setq sql-send-terminator t)
+#+begin_src emacs-lisp
+  (defvar sql-postgres-program)
+  (setq sql-postgres-program "/usr/local/bin/psql")
 
-;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
-(defvar sql-presto-program)
-(defvar sql-presto-login-params)
-(setq sql-presto-program "sane-presto"
-      sql-presto-login-params '((user :default "patrick")
-				(database :default "")))
+  (defvar sql-send-terminator)
+  (setq sql-send-terminator t)
 
-(defun sql-presto ()
-  "Connect to presto."
-  (interactive)
-  (let ((sql-product 'presto))
-    (sql-connect 'presto)
-    ))
+  (setq sql-send-terminator ";")
 
-;; To connect to a local db sqlite db:
-;; M-x sql-sqlite
-;; <name_of_db.db>
 
-(defun sql-comint-presto (product options x)
-  "Interactive connection to presto.
-PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
-We don't know what X is."
-  (let ((sql-login-delay 0.9))
-    (message "%S" product)
-    (message "%S" options)
-    (message "%S" x)
-    (sql-comint product options)))
 
-(defun set-sql-buffer ()
-  "Point to *SQL*."
-  (interactive)
-  (setq sql-buffer "*SQL*"))
+  ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
+  (defvar sql-presto-program)
+  (setq sql-presto-program "sane-presto3")
+  ;; not used -- prevent emacs from asking for these
+  (defvar sql-presto-login-params)
+  (setq sql-presto-login-params '((user :default "patrick")
+                                  (database :default "")))
 
-(global-set-key (kbd "C-c q") 'set-sql-bufer)
+  (defun sql-comint-presto (product options x)
+    "Interactive connection to presto.
+        PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
+        We don't know what X is."
+    (let ((sql-login-delay 0.9))
+      (message "%S" product)
+      (message "%S" options)
+      (message "%S" x)
+      (sql-comint product options)))
 
+  (defvar sql-product-alist)
+  (add-to-list 'sql-product-alist
+               '(presto
+                 :name "Presto"
+                 :free-software t
+                 :font-lock sql-mode-postgres-font-lock-keywords
+                 :sqli-program sql-presto-program
+                 :sqli-login sql-presto-login-params
+                 :sqli-comint-func sql-comint-presto
+                 :prompt-regexp "^\\w*[#>] "
+                 :prompt-length 8
+                 :prompt-cont-regexp "^\\w*[-(]*[#>] "
+                 :input-filter sql-remove-tabs-filter
+                 :terminator ("\\(^\\s-*\\\\g$\\|;\\)" . "\\g")))
+
+  (defun sql-presto ()
+    "Connect to presto."
+    (interactive)
+    (let ((sql-product 'presto))
+      (sql-connect 'presto)
+      ))
+
+  ;; To connect to a local db sqlite db:
+  ;; M-x sql-sqlite
+  ;; <name_of_db.db>
+
+  (defun set-sql-buffer ()
+    "Point to *SQL*."
+    (interactive)
+    (setq sql-buffer "*SQL*"))
+
+  ;;(global-set-key (kbd "C-c q") 'set-sql-bufer)
 #+end_src
+
 
 ** Other Languages
 
