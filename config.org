@@ -17,6 +17,7 @@
   - [[#r][R]]
   - [[#sql][SQL]]
   - [[#other-languages][Other Languages]]
+  - [[#copilot][CoPilot]]
   - [[#misc--everything-else][Misc / Everything else]]
 - [[#basic-orgmode][Basic Orgmode]]
 
@@ -827,6 +828,39 @@ First some generic sql setup.
     (bind-key [remap find-tag] #'godef-jump))
   :config
   (add-hook 'go-mode-hook 'electric-pair-mode))
+#+end_src
+** CoPilot
+
+Not sure if this will work.  
+
+#+begin_src emacs-lisp
+      (use-package copilot
+        :straight (
+          copilot :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")
+                   )
+        :ensure t
+        :init (setq copilot-node-executable "/Users/patrickfoley/.asdf/installs/nodejs/17.9.1/bin/node")
+        :config (
+
+      )
+)
+#+end_src
+
+
+Now try that and try =M-x copilot-login=.  
+
+Wow that worked!  And it's pretty slick!  You need to activate =copilot-mode=, but it works!
+
+So now let me see if I can get tab completion working.  This hasn't worked in the =config= or =init= sections yet.
+
+#+begin_src emacs-lisp
+(defun my/copilot-tab ()
+  (interactive)
+  (or (copilot-accept-completion)
+      (indent-for-tab-command)))
+
+(with-eval-after-load 'copilot
+  (define-key copilot-mode-map (kbd "<tab>") #'my/copilot-tab))
 #+end_src
 
 ** Misc / Everything else
