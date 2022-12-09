@@ -17,6 +17,7 @@
   - [[#r][R]]
   - [[#sql][SQL]]
   - [[#other-languages][Other Languages]]
+  - [[#copilot][CoPilot]]
   - [[#misc--everything-else][Misc / Everything else]]
 - [[#basic-orgmode][Basic Orgmode]]
 
@@ -199,27 +200,28 @@ OSX copy/paste
 ** Themes
 
 #+begin_src emacs-lisp
-;; Themes
-(use-package doom-themes
-  :straight t
-  :init (load-theme 'doom-solarized-light)
-)
-
-(use-package cycle-themes
-  :straight (
-    cycle-themes :type git :host github :repo "toroidal-code/cycle-themes.el"
-                 :fork (:host github :repo "patrickeganfoley/cycle-themes.el"))
-  ;;  This is also annoying for ein/jupyter.  Uses c-t for toggling cells.
-  ;;  You should fork it and install following  https://github.com/raxod502/straight.el#integration-with-use-package
-  ;; your issue is https://github.com/toroidal-code/cycle-themes.el/issues/3
-  :init (setq cycle-themes-theme-list
-	      '(doom-solarized-light
-		doom-solarized-dark
-		doom-monokai-classic
-                ;; zenburn
-		)
-              )
+  ;; Themes
+  (use-package doom-themes
+    :straight t
+    :init (load-theme 'doom-solarized-dark)
   )
+
+  (use-package cycle-themes
+    :straight (
+      cycle-themes :type git :host github :repo "toroidal-code/cycle-themes.el"
+                   :fork (:host github :repo "patrickeganfoley/cycle-themes.el")
+                   )
+    ;;  This is also annoying for ein/jupyter.  Uses c-t for toggling cells.
+    ;;  You should fork it and install following  https://github.com/raxod502/straight.el#integration-with-use-package
+    ;; your issue is https://github.com/toroidal-code/cycle-themes.el/issues/3
+    :init (setq cycle-themes-theme-list
+                '(doom-solarized-light
+                  doom-solarized-dark
+                  doom-monokai-classic
+                  ;; zenburn
+                  )
+                )
+    )
 
 
 #+end_src
@@ -511,6 +513,17 @@ Version 2018-09-07"
   :init (add-hook 'org-mode-hook #'toc-org-enable)
 )
 #+end_src
+
+You can put =# -*- org-confirm-babel-evaluate: nil -*-=
+at the top of a document to avoid typing =yes= to 20+ src blocks.
+
+
+You can also use
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
+#+end_src
+
+
 ** Markdown
 #+begin_src emacs-lisp
 (use-package markdown-mode
@@ -684,6 +697,10 @@ Version 2018-09-07"
   :straight t
   )
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)))
+
 #+end_src
 ** SQL
 
@@ -815,6 +832,39 @@ First some generic sql setup.
     (bind-key [remap find-tag] #'godef-jump))
   :config
   (add-hook 'go-mode-hook 'electric-pair-mode))
+#+end_src
+** CoPilot
+
+Not sure if this will work.  
+
+#+begin_src emacs-lisp
+      (use-package copilot
+        :straight (
+          copilot :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")
+                   )
+        :ensure t
+        :init (setq copilot-node-executable "/Users/patrickfoley/.asdf/installs/nodejs/17.9.1/bin/node")
+        :config (
+
+      )
+)
+#+end_src
+
+
+Now try that and try =M-x copilot-login=.  
+
+Wow that worked!  And it's pretty slick!  You need to activate =copilot-mode=, but it works!
+
+So now let me see if I can get tab completion working.  This hasn't worked in the =config= or =init= sections yet.
+
+#+begin_src emacs-lisp
+(defun my/copilot-tab ()
+  (interactive)
+  (or (copilot-accept-completion)
+      (indent-for-tab-command)))
+
+(with-eval-after-load 'copilot
+  (define-key copilot-mode-map (kbd "<tab>") #'my/copilot-tab))
 #+end_src
 
 ** Misc / Everything else
