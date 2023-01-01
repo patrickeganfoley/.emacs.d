@@ -127,22 +127,26 @@ VALUE from 0 = transparent, 100 = opaque"
 #+end_src
 ** Path Things / OSX
 #+begin_src emacs-lisp
-;;  Shell things
-(use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
-  :straight t
-  :config
-  (exec-path-from-shell-initialize))
-;; Got this stuff from Mickey Peterson
-;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-;; (setq explicit-shell-file-name "/bin/bash")
+;;  Shell thing
 (setq shell-file-name "bash")
 ;; Is this necessary if I have exec-path-from-shell??
 (setenv "SHELL" shell-file-name)
 (setenv "ESHELL" shell-file-name)
 
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :straight t
+  :init
+  (exec-path-from-shell-initialize))
+;; Got this stuff from Mickey Peterson
+;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
+;; (setq explicit-shell-file-name "/bin/bash")
+#+end_src
 
+Most =$PATH= things are correct, but sdk-man sets itself up with a script that runs in each shell rather than adding to your =$PATH= itself.  So we need to manually add the sdk directory in order for us to get the right java.
 
+#+begin_src emacs-lisp
+(setq exec-path (append '("/Users/patrick.foley/.sdkman/candidates/java/current/bin/") exec-path))
 #+end_src
 
 Web stuff.  I removed osx-browse, which I used to use to set up safari.
