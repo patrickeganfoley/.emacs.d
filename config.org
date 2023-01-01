@@ -796,6 +796,37 @@ First some generic sql setup.
       (sql-connect 'presto)
       ))
 
+  ;; Now let's add ~/data/basketball.db to our sql-product-alist
+  (add-to-list 'sql-product-alist
+               '(basketball
+                 :name "Basketball"
+                 :free-software t
+                 :font-lock sql-mode-postgres-font-lock-keywords
+                 :sqli-program sql-sqlite-program
+                 :sqli-login sql-sqlite-login-params
+                 :sqli-comint-func sql-comint-sqlite
+                 :prompt-regexp "^\\w*[#>] "
+                 :prompt-length 8
+                 :prompt-cont-regexp "^\\w*[-(]*[#>] "
+                 :input-filter sql-remove-tabs-filter
+                 :terminator ("\\(^\\s-*\\\\g$\\|;\\)" . "\\g")))
+
+        (defun sql-basketball ()
+                "Connect to basketball."
+                (interactive)
+                (let ((sql-product 'basketball))
+                (sql-connect 'basketball)
+                ))
+
+  ;; I think I also need to add to sql-connections-alist
+        (add-to-list 'sql-connection-alist
+                 '(basketball
+                         (sql-product 'basketball)
+                         (sql-database "~/sports/data/basketball.db")
+                         (sql-server "localhost")
+                         (sql-user "patrick")
+                         (sql-password "")))
+
   ;; To connect to a local db sqlite db:
   ;; M-x sql-sqlite
   ;; <name_of_db.db>
