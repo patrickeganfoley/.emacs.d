@@ -750,97 +750,98 @@ First some generic sql setup.
 #+end_src 
 
 #+begin_src emacs-lisp
-  (defvar sql-postgres-program)
-  (setq sql-postgres-program "/usr/local/bin/psql")
+    (defvar sql-postgres-program)
+    (setq sql-postgres-program "/usr/local/bin/psql")
 
-  (defvar sql-send-terminator)
-  (setq sql-send-terminator t)
+    (defvar sql-send-terminator)
+    (setq sql-send-terminator t)
 
-  (setq sql-send-terminator ";")
+    (setq sql-send-terminator ";")
 
 
 
-  ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
-  (defvar sql-presto-program)
-  (setq sql-presto-program "sane-presto3")
-  ;; not used -- prevent emacs from asking for these
-  (defvar sql-presto-login-params)
-  (setq sql-presto-login-params '((user :default "patrick")
-                                  (database :default "")))
+    ;; Get this from https://github.com/stitchfix/booga/blob/master/gsn/bin/sane-presto
+    (defvar sql-presto-program)
+    (setq sql-presto-program "sane-presto3")
+    ;; not used -- prevent emacs from asking for these
+    (defvar sql-presto-login-params)
+    (setq sql-presto-login-params '((user :default "patrick")
+                                    (database :default "")))
 
-  (defun sql-comint-presto (product options x)
-    "Interactive connection to presto.
-        PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
-        We don't know what X is."
-    (let ((sql-login-delay 0.9))
-      (message "%S" product)
-      (message "%S" options)
-      (message "%S" x)
-      (sql-comint product options)))
+    (defun sql-comint-presto (product options x)
+      "Interactive connection to presto.
+          PRODUCT is maybe presto, maybe psql.  OPTIONS I don't use.
+          We don't know what X is."
+      (let ((sql-login-delay 0.9))
+        (message "%S" product)
+        (message "%S" options)
+        (message "%S" x)
+        (sql-comint product options)))
 
-  (defvar sql-product-alist)
-  (add-to-list 'sql-product-alist
-               '(presto
-                 :name "Presto"
-                 :free-software t
-                 :font-lock sql-mode-postgres-font-lock-keywords
-                 :sqli-program sql-presto-program
-                 :sqli-login sql-presto-login-params
-                 :sqli-comint-func sql-comint-presto
-                 :prompt-regexp "^\\w*[#>] "
-                 :prompt-length 8
-                 :prompt-cont-regexp "^\\w*[-(]*[#>] "
-                 :input-filter sql-remove-tabs-filter
-                 :terminator ("\\(^\\s-*\\\\g$\\|;\\)" . "\\g")))
+    (defvar sql-product-alist)
+    (add-to-list 'sql-product-alist
+                 '(presto
+                   :name "Presto"
+                   :free-software t
+                   :font-lock sql-mode-postgres-font-lock-keywords
+                   :sqli-program sql-presto-program
+                   :sqli-login sql-presto-login-params
+                   :sqli-comint-func sql-comint-presto
+                   :prompt-regexp "^\\w*[#>] "
+                   :prompt-length 8
+                   :prompt-cont-regexp "^\\w*[-(]*[#>] "
+                   :input-filter sql-remove-tabs-filter
+                   :terminator ("\\(^\\s-*\\\\g$\\|;\\)" . "\\g")))
 
-  (defun sql-presto ()
-    "Connect to presto."
-    (interactive)
-    (let ((sql-product 'presto))
-      (sql-connect 'presto)
-      ))
+    (defun sql-presto ()
+      "Connect to presto."
+      (interactive)
+      (let ((sql-product 'presto))
+        (sql-connect 'presto)
+        ))
 
-  ;; Now let's add ~/data/basketball.db to our sql-product-alist
-  (add-to-list 'sql-product-alist
-               '(basketball
-                 :name "Basketball"
-                 :free-software t
-                 :font-lock sql-mode-postgres-font-lock-keywords
-                 :sqli-program sql-sqlite-program
-                 :sqli-login sql-sqlite-login-params
-                 :sqli-comint-func sql-comint-sqlite
-                 :prompt-regexp "^\\w*[#>] "
-                 :prompt-length 8
-                 :prompt-cont-regexp "^\\w*[-(]*[#>] "
-                 :input-filter sql-remove-tabs-filter
-                 :terminator ("\\(^\\s-*\\\\g$\\|;\\)" . "\\g")))
-
-        (defun sql-basketball ()
-                "Connect to basketball."
-                (interactive)
-                (let ((sql-product 'basketball))
-                (sql-connect 'basketball)
-                ))
-
-  ;; I think I also need to add to sql-connections-alist
-        (add-to-list 'sql-connection-alist
+    ;; Now let's add ~/data/basketball.db to our sql-product-alist
+    (add-to-list 'sql-product-alist
                  '(basketball
-                         (sql-product 'basketball)
-                         (sql-database "~/sports/data/basketball.db")
-                         (sql-server "localhost")
-                         (sql-user "patrick")
-                         (sql-password "")))
+                   :name "Basketball"
+                   :free-software t
+                   :font-lock sql-mode-postgres-font-lock-keywords
+                   :sqli-program sql-sqlite-program
+                   :sqli-login sql-sqlite-login-params
+                   :sqli-comint-func sql-comint-sqlite
+                   :prompt-regexp "^\\w*[#>] "
+                   :prompt-length 8
+                   :prompt-cont-regexp "^\\w*[-(]*[#>] "
+                   :input-filter sql-remove-tabs-filter
+                   :terminator ("\\(^\\s-*\\\\g$\\|;\\)" . "\\g")))
 
-  ;; To connect to a local db sqlite db:
-  ;; M-x sql-sqlite
-  ;; <name_of_db.db>
+          (defun sql-basketball ()
+                  "Connect to basketball."
+                  (interactive)
+                  (let ((sql-product 'basketball))
+                  (sql-connect 'basketball)
+                  ))
 
-  (defun set-sql-buffer ()
-    "Point to *SQL*."
-    (interactive)
-    (setq sql-buffer "*SQL*"))
+          (add-to-list 'sql-connection-alist
+                   '(basketball
+                           (sql-product 'basketball)
+                           (sql-database "~/sports/data/basketball.db")
+                           (sql-server "localhost")
+                           (sql-user "patrick")
+                           (sql-password "")
+                           (sql-read-only t)
+                           ))
 
-  ;;(global-set-key (kbd "C-c q") 'set-sql-bufer)
+    ;; To connect to a local db sqlite db:
+    ;; M-x sql-sqlite
+    ;; <name_of_db.db>
+
+    (defun set-sql-buffer ()
+      "Point to *SQL*."
+      (interactive)
+      (setq sql-buffer "*SQL*"))
+
+    ;;(global-set-key (kbd "C-c q") 'set-sql-bufer)
 #+end_src
 
 
