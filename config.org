@@ -203,7 +203,7 @@ OSX copy/paste
   ;; Themes
   (use-package doom-themes
     :straight t
-    :init (load-theme 'doom-solarized-dark)
+    :init (load-theme 'doom-solarized-light)
   )
 
   (use-package cycle-themes
@@ -661,10 +661,9 @@ You can also use
   (defvar ein:jupyter-default-server-command)
   (defvar ein:jupyter-server-args)
   (setq ein:jupyter-default-server-command "/usr/local/bin/jupyter"
-	ein:jupyter-server-args (list "--no-browser")))
-
-
-
+	ein:jupyter-server-args (list "--no-browser"))
+  (setq ein:output-area-inlined-images t)
+)
 #+end_src
 
 ** R
