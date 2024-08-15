@@ -50,6 +50,7 @@ And let's try to open this file on startup.
 (load-file custom-file)
 #+end_src
 ** Package Bootstrapping
+
 #+begin_src emacs-lisp
 ;; Bootstrap straight.el
 ;; https://github.com/raxod502/straight.el#getting-started
@@ -73,7 +74,12 @@ And let's try to open this file on startup.
 ;; Set straight-check-for-modifications to nil before the bootstrap if
 ;; you don't want straight to do automatic updating.
 (straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
 #+end_src
+
+#+RESULTS:
+: t
 
 ** Basic UI
 
@@ -95,18 +101,15 @@ And let's try to open this file on startup.
 (set-frame-font "Menlo 24")
 
 (use-package command-log-mode
-  :straight t
 )
 
 ;; Without this, doom-modeline will display chinese characters, which
 ;; I cannot read.
 ;; You also need to run M-x all-the-icons-install-fonts
 (use-package all-the-icons
-  :straight t
   :if (display-graphic-p))
 
 (use-package doom-modeline
-  :straight t
   :init (doom-modeline-mode 1)
   :custom
   (doom-modeline-height 15)
@@ -121,7 +124,6 @@ VALUE from 0 = transparent, 100 = opaque"
   (set-frame-parameter (selected-frame) 'alpha value))
 
 (use-package rainbow-delimiters
-  :straight t
   :hook (prog-mode . rainbow-delimiters-mode)
   )
 #+end_src
@@ -135,7 +137,6 @@ VALUE from 0 = transparent, 100 = opaque"
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
-  :straight t
   :init
   (exec-path-from-shell-initialize))
 ;; Got this stuff from Mickey Peterson
@@ -153,12 +154,10 @@ Web stuff.  I removed osx-browse, which I used to use to set up safari.
 
 #+begin_src emacs-lisp
 (use-package browse-at-remote
-  :straight t
   :bind ("C-c g g" . browse-at-remote)
 )
 
-(use-package google-this
-  :straight t)
+(use-package google-this)
 #+end_src
 
 OSX copy/paste
@@ -202,7 +201,6 @@ OSX copy/paste
 #+begin_src emacs-lisp
   ;; Themes
   (use-package doom-themes
-    :straight t
     :init (load-theme 'doom-solarized-light)
   )
 
@@ -227,35 +225,21 @@ OSX copy/paste
 #+end_src
 ** Magit
 #+begin_src emacs-lisp
-(use-package magit
-  :straight t
-  :bind (("C-x g" . magit-status))
-  :config (progn
-	    ;; The following two are critical for making magit 2.1.0 work more
-	    ;; like 1.x for me: WITHOUT these, creating a new topic branch
-	    ;; defaults its remote to master -- and pushing the topic branch
-	    ;; pushes to master (?!?). WITH these, you're prompted on the
-	    ;; first push, and need to supply origin/<topic-branch-name>, but
-	    ;; thereafter it's set and all is well.
-	    (setq magit-branch-arguments '()) ;do NOT want --track
-	    (setq magit-push-arguments '("--set-upstream")))) ;aka -u
-
-
-;; https://emacsair.me/2018/12/19/forge-0.1/
-;; NOTE: Make sure to configure a GitHub token before using this package!
-;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
-;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
-(use-package forge
-  :straight t
-  :after magit
-  )
-
-;; I don't really know what this is,
-;; but I think forge needs it.
-(use-package transient
-  :straight t
-  )
+    (use-package magit
+      :bind (("C-x g" . magit-status))
+      :config (progn
+                ;; The following two are critical for making magit 2.1.0 work more
+                ;; like 1.x for me: WITHOUT these, creating a new topic branch
+                ;; defaults its remote to master -- and pushing the topic branch
+                ;; pushes to master (?!?). WITH these, you're prompted on the
+                ;; first push, and need to supply origin/<topic-branch-name>, but
+                ;; thereafter it's set and all is well.
+                (setq magit-branch-arguments '()) ;do NOT want --track
+                (setq magit-push-arguments '("--set-upstream")))) ;aka -u
 #+end_src
+
+I might want to add back =(use-package forge :after magit)=, but currently it's causing trouble with https://github.com/magit/forge/issues/535#issuecomment-1387734805 
+
 ** Buffer / Window Navigation
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-x o") 'next-multiframe-window)
@@ -660,7 +644,7 @@ You can also use
   :config
   (defvar ein:jupyter-default-server-command)
   (defvar ein:jupyter-server-args)
-  (setq ein:jupyter-default-server-command "/usr/local/bin/jupyter"
+  (setq ein:jupyter-default-server-command "~/venvs/sf3919/bin/jupyter"
 	ein:jupyter-server-args (list "--no-browser"))
   (setq ein:output-area-inlined-images t)
 )
@@ -874,7 +858,7 @@ Not sure if this will work.
           copilot :type git :host github :repo "zerolfx/copilot.el" :files ("dist" "*.el")
                    )
         :ensure t
-        :init (setq copilot-node-executable "/Users/patrickfoley/.asdf/installs/nodejs/17.9.1/bin/node")
+        :init (setq copilot-node-executable "/Users/patrick.foley/.asdf/installs/nodejs/20.3.1/bin/node")
         :config (
 
       )
