@@ -31,6 +31,8 @@ rm -rf ~/.emacs.d/straight
 find ~/.emacs.d -name "*.elc" -delete
 #+end_src
 
+You'll also want to run =all-the-icons-install-fonts=.
+
 Reload the config with ~load-init~.
 
 #+begin_src emacs-lisp
