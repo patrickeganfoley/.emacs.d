@@ -23,6 +23,14 @@
 
 * Emacs Config
 
+Note - next time you upgrade emacs, you should delete all of `/straight/` and any compiled files.  
+
+#+begin_src bash
+cp ~/.emacs.d ~/.emacs.d.bak
+rm -rf ~/.emacs.d/straight
+find ~/.emacs.d -name "*.elc" -delete
+#+end_src
+
 Reload the config with ~load-init~.
 
 #+begin_src emacs-lisp
@@ -225,17 +233,23 @@ OSX copy/paste
 #+end_src
 ** Magit
 #+begin_src emacs-lisp
-    (use-package magit
-      :bind (("C-x g" . magit-status))
-      :config (progn
-                ;; The following two are critical for making magit 2.1.0 work more
-                ;; like 1.x for me: WITHOUT these, creating a new topic branch
-                ;; defaults its remote to master -- and pushing the topic branch
-                ;; pushes to master (?!?). WITH these, you're prompted on the
-                ;; first push, and need to supply origin/<topic-branch-name>, but
-                ;; thereafter it's set and all is well.
-                (setq magit-branch-arguments '()) ;do NOT want --track
-                (setq magit-push-arguments '("--set-upstream")))) ;aka -u
+(use-package emacsql)
+
+        (use-package magit
+          :bind (("C-x g" . magit-status))
+          :config (progn
+                    ;; The following two are critical for making magit 2.1.0 work more
+                    ;; like 1.x for me: WITHOUT these, creating a new topic branch
+                    ;; defaults its remote to master -- and pushing the topic branch
+                    ;; pushes to master (?!?). WITH these, you're prompted on the
+                    ;; first push, and need to supply origin/<topic-branch-name>, but
+                    ;; thereafter it's set and all is well.
+                    (setq magit-branch-arguments '()) ;do NOT want --track
+                    (setq magit-push-arguments '("--set-upstream")))) ;aka -u
+
+  (use-package forge
+    :after magit)
+
 #+end_src
 
 I might want to add back =(use-package forge :after magit)=, but currently it's causing trouble with https://github.com/magit/forge/issues/535#issuecomment-1387734805 
