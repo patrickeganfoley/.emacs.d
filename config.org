@@ -17,7 +17,9 @@
   - [[#r][R]]
   - [[#sql][SQL]]
   - [[#other-languages][Other Languages]]
-  - [[#copilot][CoPilot]]
+  - [[#llms][LLMs]]
+    - [[#gptel][GPTel]]
+    - [[#copilot][CoPilot]]
   - [[#misc--everything-else][Misc / Everything else]]
 - [[#basic-orgmode][Basic Orgmode]]
 
@@ -666,7 +668,8 @@ You can also use
 )
 #+end_src
 
-** R
+** R 
+
 #+begin_src emacs-lisp
 ;; R Rlang R ESS
 (use-package ess
@@ -864,7 +867,40 @@ First some generic sql setup.
   :config
   (add-hook 'go-mode-hook 'electric-pair-mode))
 #+end_src
-** CoPilot
+** LLMs
+
+Auths are from =secrets.el=. 
+
+*** GPTel
+
+#+begin_src emacs-lisp
+  (use-package gptel
+    :config
+    :bind (
+           ("C-c g" . gptel)
+           ("C-c G" . gptel-send))
+    )
+
+
+
+  (gptel-make-anthropic "Claude"          ;Any name you want
+    :stream t                             ;Streaming responses
+    :key 'anthropic-api-key)
+
+  ;; OPTIONAL configuration
+  (setq
+   gptel-model "claude-3-sonnet-20240620" ;  "claude-3-opus-20240229" also available
+   gptel-backend (gptel-make-anthropic "Claude"
+                         :stream t :key 'anthropic-api-key)
+   gptel-default-mode 'org-mode
+   gptel-max-tokens 1000
+   )
+#+end_src
+
+#+RESULTS:
+: 1000
+
+*** CoPilot
 
 Not sure if this will work.  
 
