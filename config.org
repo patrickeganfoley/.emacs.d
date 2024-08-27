@@ -398,6 +398,9 @@ flymake is the built-in version of syntax checking.
   ;; Use C-c ! v to check out flycheck settings
   ;; Use C-c ! n to check the next error!
   )
+
+;; I might want to point this to ~/.asdf/shims/python3
+   (setq flycheck-python-pycompile-executable "python3")
 #+end_src
 
 Python has several syntax checkers, pylint and flake8 are the main ones, and mypy does static type checking.
