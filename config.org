@@ -139,6 +139,15 @@ VALUE from 0 = transparent, 100 = opaque"
   :hook (prog-mode . rainbow-delimiters-mode)
   )
 #+end_src
+
+#+begin_src emacs-lisp
+
+
+#+end_src
+
+#+RESULTS:
+| doom-1337 | doom-Iosvkem | doom-acario-dark | doom-acario-light | doom-ayu-dark | doom-ayu-light | doom-ayu-mirage | doom-badger | doom-bluloco-dark | doom-bluloco-light | doom-challenger-deep | doom-city-lights | doom-dark+ | doom-dracula | doom-earl-grey | doom-ephemeral | doom-fairy-floss | doom-feather-dark | doom-feather-light | doom-flatwhite | doom-gruvbox-light | doom-gruvbox | doom-henna | doom-homage-black | doom-homage-white | doom-horizon | doom-ir-black | doom-lantern | doom-laserwave | doom-manegarm | doom-material-dark | doom-material | doom-meltbus | doom-miramare | doom-molokai | doom-monokai-classic | doom-monokai-machine | doom-monokai-octagon | doom-monokai-pro | doom-monokai-ristretto | doom-monokai-spectrum | doom-moonlight | doom-nord-aurora | doom-nord-light | doom-nord | doom-nova | doom-oceanic-next | doom-oksolar-dark | doom-oksolar-light | doom-old-hope | doom-one-light | doom-one | doom-opera-light | doom-opera | doom-outrun-electric | doom-palenight | doom-peacock | doom-pine | doom-plain-dark | doom-plain | doom-rouge | doom-shades-of-purple | doom-snazzy | doom-solarized-dark-high-contrast | doom-solarized-dark | doom-solarized-light | doom-sourcerer | doom-spacegrey | doom-tokyo-night | doom-tomorrow-day | doom-tomorrow-night | doom-vibrant | doom-wilmersdorf | doom-winter-is-coming-dark-blue | doom-winter-is-coming-light | doom-xcode | doom-zenburn |
+
 ** Path Things / OSX
 #+begin_src emacs-lisp
 ;;  Shell thing
@@ -211,29 +220,27 @@ OSX copy/paste
 
 #+begin_src emacs-lisp
   ;; Themes
+  (setq my-themes-list '(doom-solarized-light doom-solarized-dark doom-monokai-classic))
+
   (use-package doom-themes
-    :init (load-theme 'doom-solarized-light)
-  )
+    :config 
+    (dolist (theme my-themes-list)
+      (load-theme theme t t)))
+
+  (setq custom-safe-themes t)
 
   (use-package cycle-themes
     :straight (
       cycle-themes :type git :host github :repo "toroidal-code/cycle-themes.el"
                    :fork (:host github :repo "patrickeganfoley/cycle-themes.el")
                    )
-    ;;  This is also annoying for ein/jupyter.  Uses c-t for toggling cells.
-    ;;  You should fork it and install following  https://github.com/raxod502/straight.el#integration-with-use-package
-    ;; your issue is https://github.com/toroidal-code/cycle-themes.el/issues/3
-    :init (setq cycle-themes-theme-list
-                '(doom-solarized-light
-                  doom-solarized-dark
-                  doom-monokai-classic
-                  ;; zenburn
-                  )
+    :config (setq cycle-themes-theme-list
+                  my-themes-list
                 )
+    :bind ("C-c c" . cycle-themes)
     )
-
-
 #+end_src
+
 ** Magit
 #+begin_src emacs-lisp
 (use-package emacsql)
