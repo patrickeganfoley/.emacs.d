@@ -90,8 +90,6 @@ And let's try to open this file on startup.
 
 #+end_src
 
-#+RESULTS:
-: t
 
 ** Basic UI
 
