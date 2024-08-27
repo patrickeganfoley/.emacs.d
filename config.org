@@ -157,7 +157,6 @@ VALUE from 0 = transparent, 100 = opaque"
 #+end_src
 
 Most =$PATH= things are correct, but sdk-man sets itself up with a script that runs in each shell rather than adding to your =$PATH= itself.  So we need to manually add the sdk directory in order for us to get the right java.
-
 #+begin_src emacs-lisp
 (setq exec-path (append '("/Users/patrick.foley/.sdkman/candidates/java/current/bin/") exec-path))
 #+end_src
@@ -166,7 +165,7 @@ Web stuff.  I removed osx-browse, which I used to use to set up safari.
 
 #+begin_src emacs-lisp
 (use-package browse-at-remote
-  :bind ("C-c g g" . browse-at-remote)
+  :bind ("C-c b r" . browse-at-remote)
 )
 
 (use-package google-this)
