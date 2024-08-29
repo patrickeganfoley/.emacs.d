@@ -227,6 +227,11 @@ OSX copy/paste
 
   (setq custom-safe-themes t)
 
+(use-package solaire-mode
+  :config
+  (solaire-global-mode +1)
+)
+
   (use-package cycle-themes
     :straight (
       cycle-themes :type git :host github :repo "toroidal-code/cycle-themes.el"
