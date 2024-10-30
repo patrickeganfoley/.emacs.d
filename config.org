@@ -115,7 +115,8 @@ And let's try to open this file on startup.
 
 ;; Without this, doom-modeline will display chinese characters, which
 ;; I cannot read.
-;; You also need to run M-x all-the-icons-install-fonts
+;; You also need to run M-x all-the-icons-install-fonts 
+;; and nerd-icons-install-fonts
 (use-package all-the-icons
   :if (display-graphic-p))
 
@@ -245,6 +246,10 @@ OSX copy/paste
 #+end_src
 
 ** Magit
+
+Commands to remember:
+  - =C-c d r= is diff-range, use this to check diff of a file (--limit to file) against a branch. 
+
 #+begin_src emacs-lisp
 (use-package emacsql)
 
@@ -886,31 +891,44 @@ Auths are from =secrets.el=.
 *** GPTel
 
 #+begin_src emacs-lisp
-  (use-package gptel
-    :config
-    :bind (
-           ("C-c g" . gptel)
-           ("C-c G" . gptel-send))
-    )
+        (use-package gptel
+          :config
+          :bind (
+                 ("C-c g" . gptel)
+                 ("C-c G" . gptel-send))
+          )
 
 
 
-  (gptel-make-anthropic "Claude"          ;Any name you want
-    :stream t                             ;Streaming responses
-    :key 'anthropic-api-key)
+  (setq gptel-default-mode 'org-mode)
+  ;; (setq gptel-model "gpt-4o")
 
-  ;; OPTIONAL configuration
-  (setq
-   gptel-model "claude-3-5-sonnet-20240620" ;  "claude-3-opus-20240229" also available
-   gptel-backend (gptel-make-anthropic "Claude"
-                         :stream t :key 'anthropic-api-key)
-   gptel-default-mode 'org-mode
-   gptel-max-tokens 5000
-   )
+        (gptel-make-anthropic "Claude"          ;Any name you want
+          :stream t                             ;Streaming responses
+          :key 'anthropic-api-key)
+
+        ;; OPTIONAL configuration
+        (setq
+         gptel-model "claude-3-5-sonnet-20240620" ;  "claude-3-opus-20240229" also available
+         gptel-backend (gptel-make-anthropic "Claude"
+                               :stream t :key 'anthropic-api-key)
+         gptel-default-mode 'org-mode
+         gptel-max-tokens 5000
+         )
+
+
+      ;; https://github.com/karthink/gptel/issues/351
+      ;; for the 
+      ;; Claude error: (HTTP/2 400) messages.2: all ;;messages must have non-empty content except ;; for the optional final assistant message
+      ;;issue 
+      (defun my/gptel-font-lock-update (&rest _)
+          (when (and font-lock-mode (derived-mode-p 'org-mode))
+            (font-lock-update)))
+      (add-hook 'gptel-post-response-functions #'my/gptel-font-lock-update)
 #+end_src
 
 #+RESULTS:
-: 1000
+| my/gptel-font-lock-update |
 
 *** CoPilot
 
