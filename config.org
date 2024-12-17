@@ -88,6 +88,8 @@ And let's try to open this file on startup.
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
 
+(setq desktop-path '("~/.emacs.d/"))
+
 #+end_src
 
 
