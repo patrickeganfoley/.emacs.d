@@ -8,6 +8,7 @@
   - [[#magit][Magit]]
   - [[#buffer--window-navigation][Buffer / Window Navigation]]
   - [[#search--ivy--counsel][Search / Ivy / Counsel]]
+  - [[#v-term][v-term]]
   - [[#autocomplete][Autocomplete]]
   - [[#linters][Linters]]
   - [[#generic-editing][Generic Editing]]
@@ -381,6 +382,15 @@ smex/amx - older version of replace search
 
 )
 #+end_src
+** v-term
+
+#+begin_src emacs-lisp
+   (use-package vterm
+     :ensure t)
+#+end_src
+
+#+RESULTS:
+
 ** Autocomplete
 The major autocompletion tools are company mode and auto-complete. company-mode is more actively maintained and has a better API for
 plugins.  You will need to install plugins for different languages just like you install different backends for syntax checking with
