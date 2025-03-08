@@ -932,6 +932,23 @@ Auths are from =secrets.el=.
 #+RESULTS:
 | my/gptel-font-lock-update |
 
+I am trying to be able to save/load contexts as files.
+
+#+begin_src emacs-lisp
+(org-babel-load-file "~/.emacs.d/gptel-context-persistence.org")
+#+end_src
+
+#+RESULTS:
+: Loaded ~/.emacs.d/gptel-context-persistence.el
+
+
+#+begin_src emacs-lisp
+;; Add a keybinding for the context manager
+;;(global-set-key (kbd "C-c g p t") 'gptel-context-manager)
+#+end_src
+
+
+
 *** CoPilot
 
 Not sure if this will work.  

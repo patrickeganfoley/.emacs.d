@@ -1,0 +1,298 @@
+* GPTel Context Persistence
+
+This package provides functions to save, load, and manage gptel contexts. It allows you to:
+
+1. Save contexts to files and load them back
+2. Create named contexts that can be used across different gptel buffers
+3. Switch between different contexts in different chat windows
+
+** Core Functionality
+
+#+begin_src emacs-lisp
+;;; gptel-context-persistence.el --- Save and load gptel contexts -*- lexical-binding: t; -*-
+
+;; This file provides commands to save and load gptel contexts from disk.
+;; Depends on gptel and gptel-context (bundled with gptel).
+;;
+;; Usage:
+;;   M-x gptel-context-save-to-file
+;;   M-x gptel-context-load-from-file
+;;   M-x gptel-context-manager (to use named contexts across buffers)
+;;
+;; This allows you to switch projects easily by loading previously saved sets of contexts.
+
+(require 'gptel)
+(require 'gptel-context) ;; ensure this is loaded
+
+(defvar gptel-context-default-directory
+  (expand-file-name "~/.emacs.d/gptel-contexts/")
+  "Default directory to store gptel contexts.")
+
+(unless (file-directory-p gptel-context-default-directory)
+  (make-directory gptel-context-default-directory t))
+
+;; Make gptel-context--alist buffer-local (fix to ensure separate contexts per buffer)
+(defvar gptel-context--alist-original (if (boundp 'gptel-context--alist) 
+                                         gptel-context--alist
+                                       nil)
+  "Save the original value of gptel-context--alist to restore if needed.")
+
+;; Make sure gptel-context--alist is buffer-local
+(make-variable-buffer-local 'gptel-context--alist)
+
+;; Registry for managing named contexts
+(defvar gptel-context-registry (make-hash-table :test 'equal)
+  "Global registry of named contexts.
+Each entry is a cons of (name . context-alist).")
+
+(defvar gptel-context-current-name nil
+  "Name of the currently active named context in this buffer.
+This is buffer-local.")
+(make-variable-buffer-local 'gptel-context-current-name)
+
+;; Add hooks to ensure each new gptel buffer gets its own fresh context
+(defun gptel-context-persistence--initialize-buffer-local-context ()
+  "Initialize buffer-local context variables for this buffer."
+  (when (and (boundp 'gptel-mode) gptel-mode)
+    (unless (boundp 'gptel-context--alist)
+      (setq-local gptel-context--alist nil))))
+
+(add-hook 'gptel-mode-hook #'gptel-context-persistence--initialize-buffer-local-context)
+
+;;;###autoload
+(defun gptel-context-save-to-file (filename)
+  "Save current buffer's `gptel-context--alist' to FILENAME.
+The data is saved as a Lisp expression."
+  (interactive
+   (list (read-file-name "Save gptel contexts to file: "
+                         gptel-context-default-directory
+                         nil nil "context.el")))
+  (unless (boundp 'gptel-context--alist)
+    (user-error "This buffer doesn't have a gptel context. Are you in a gptel-mode buffer?"))
+  (with-temp-file filename
+    (prin1 gptel-context--alist (current-buffer)))
+  (message "gptel contexts saved to %s" filename))
+
+;;;###autoload
+(defun gptel-context-load-from-file (filename)
+  "Load `gptel-context--alist' from FILENAME into current gptel buffer.
+This replaces the current buffer's contexts entirely."
+  (interactive
+   (list (read-file-name "Load gptel contexts from file: "
+                         gptel-context-default-directory)))
+  (unless (boundp 'gptel-context--alist)
+    (user-error "This buffer doesn't have a gptel context. Are you in a gptel-mode buffer?"))
+  (let ((data (with-temp-buffer
+                (insert-file-contents filename)
+                (read (current-buffer)))))
+    (unless (listp data)
+      (user-error "Malformed data in %s" filename))
+    (setq gptel-context--alist nil)
+    ;; Clear any existing overlays in the current context first:
+    (dolist (entry gptel-context--alist)
+      (when (bufferp (car entry))
+        (with-current-buffer (car entry)
+          (dolist (ov (cdr entry))
+            (when (overlayp ov) (delete-overlay ov))))))
+    ;; Now set the new context and restore overlays:
+    (setq gptel-context--alist data)
+    (gptel-context--collect) ; Ensure overlays are valid and remove stale ones
+
+    ;; Re-create overlays from the saved context data:
+    (dolist (entry gptel-context--alist)
+      (cond
+       ((bufferp (car entry))
+        (let ((buf (car entry))
+              (overlays (cdr entry)))
+          (when (buffer-live-p buf)
+            (with-current-buffer buf
+              (dolist (ov overlays)
+                (when (and (consp ov)
+                           (numberp (car ov)) (numberp (cdr ov)))
+                  (let ((new-ov (make-overlay (car ov) (cdr ov) buf t t)))
+                    (overlay-put new-ov 'face 'gptel-context-highlight-face)
+                    (overlay-put new-ov 'gptel-context t))))))))
+       ((stringp (car entry))
+        ;; Just files, no overlay needed, just keep them in the alist
+        )))
+
+    ;; NOTE: We just restored overlays for buffer contexts. For files,
+    ;; simply keeping them in the alist is enough.
+
+    (message "gptel contexts loaded from %s" filename)))
+
+;;;###autoload
+(defun gptel-context-export-current ()
+  "Convert the current `gptel-context--alist' to a storable form.
+This returns a list suitable for serialization. Overlays are replaced
+by their start/end bounds.
+This is primarily an internal function, but you could use it if you
+want to process the contexts manually."
+  (interactive)
+  (unless (boundp 'gptel-context--alist)
+    (user-error "No gptel context in this buffer."))
+  (let (res)
+    (dolist (entry gptel-context--alist res)
+      (if (bufferp (car entry))
+          ;; Convert overlays to numeric ranges
+          (let ((buf (car entry))
+                (ovs (cdr entry))
+                ranges)
+            (dolist (ov ovs)
+              (when (overlayp ov)
+                (push (cons (overlay-start ov) (overlay-end ov)) ranges)))
+            (push (cons buf ranges) res))
+        ;; File path case
+        (push entry res)))))
+
+;; Advice gptel-context-save-to-file to export overlays as numeric ranges:
+(advice-add 'gptel-context-save-to-file :around
+            (lambda (orig-fun filename)
+              (let ((saved-alist gptel-context--alist))
+                (unwind-protect
+                    (progn
+                      (setq-local gptel-context--alist (gptel-context-export-current))
+                      (funcall orig-fun filename))
+                  (setq-local gptel-context--alist saved-alist)))))
+#+end_src
+
+** Named Context Management
+
+These functions allow managing named contexts that can be shared between different gptel buffers:
+
+#+begin_src emacs-lisp
+;;;###autoload
+(defun gptel-context-save-as-named (name)
+  "Save the current context under NAME in the registry.
+This allows reusing this context in other gptel buffers."
+  (interactive "sContext name: ")
+  (unless (boundp 'gptel-context--alist)
+    (user-error "This buffer doesn't have a gptel context. Are you in a gptel-mode buffer?"))
+  (let ((exported-context (gptel-context-export-current)))
+    (puthash name exported-context gptel-context-registry)
+    (setq gptel-context-current-name name)
+    (message "Context '%s' saved to registry" name)))
+
+;;;###autoload
+(defun gptel-context-load-named (name)
+  "Load a named context from the registry into the current buffer."
+  (interactive
+   (list
+    (completing-read "Load context: "
+                     (hash-table-keys gptel-context-registry)
+                     nil t)))
+  (unless (boundp 'gptel-context--alist)
+    (user-error "This buffer doesn't have a gptel context. Are you in a gptel-mode buffer?"))
+  (let ((context (gethash name gptel-context-registry)))
+    (unless context
+      (user-error "No context named '%s' found in registry" name))
+    
+    ;; Clear any existing overlays in the current context first
+    (dolist (entry gptel-context--alist)
+      (when (bufferp (car entry))
+        (with-current-buffer (car entry)
+          (dolist (ov (cdr entry))
+            (when (overlayp ov) (delete-overlay ov))))))
+    
+    ;; Set the new context
+    (setq gptel-context--alist context)
+    (setq gptel-context-current-name name)
+    
+    ;; Recreate overlays for buffer contexts
+    (dolist (entry gptel-context--alist)
+      (when (and (bufferp (car entry)) (buffer-live-p (car entry)))
+        (let ((buf (car entry))
+              (ranges (cdr entry)))
+          (with-current-buffer buf
+            (dolist (range ranges)
+              (when (and (consp range)
+                         (numberp (car range)) (numberp (cdr range)))
+                (let ((new-ov (make-overlay (car range) (cdr range) buf t t)))
+                  (overlay-put new-ov 'face 'gptel-context-highlight-face)
+                  (overlay-put new-ov 'gptel-context t))))))))
+    
+    (message "Loaded context '%s'" name)))
+
+;;;###autoload
+(defun gptel-context-list-named ()
+  "List all named contexts in the registry."
+  (interactive)
+  (let ((contexts (hash-table-keys gptel-context-registry)))
+    (if contexts
+        (message "Available contexts: %s" 
+                 (mapconcat 'identity contexts ", "))
+      (message "No named contexts available"))))
+
+;;;###autoload
+(defun gptel-context-delete-named (name)
+  "Delete a named context from the registry."
+  (interactive
+   (list
+    (completing-read "Delete context: "
+                     (hash-table-keys gptel-context-registry)
+                     nil t)))
+  (remhash name gptel-context-registry)
+  (message "Context '%s' deleted from registry" name))
+#+end_src
+
+** User Interface
+
+#+begin_src emacs-lisp
+;;;###autoload
+(defun gptel-context-manager ()
+  "Show a menu to manage gptel contexts."
+  (interactive)
+  (unless (boundp 'gptel-context--alist)
+    (user-error "This buffer doesn't have a gptel context. Are you in a gptel-mode buffer?"))
+  
+  (let ((action (completing-read "Manage contexts: " 
+                                '("Save current as named"
+                                  "Load named context"
+                                  "List all contexts"
+                                  "Delete named context"
+                                  "Save to file"
+                                  "Load from file"))))
+    (pcase action
+      ("Save current as named" (call-interactively #'gptel-context-save-as-named))
+      ("Load named context" (call-interactively #'gptel-context-load-named))
+      ("List all contexts" (call-interactively #'gptel-context-list-named))
+      ("Delete named context" (call-interactively #'gptel-context-delete-named))
+      ("Save to file" (call-interactively #'gptel-context-save-to-file))
+      ("Load from file" (call-interactively #'gptel-context-load-from-file)))))
+
+;;;###autoload
+(defun gptel-context-show-current ()
+  "Display the name of the currently active context in this buffer."
+  (interactive)
+  (if gptel-context-current-name
+      (message "Current context: %s" gptel-context-current-name)
+    (message "No named context active in this buffer")))
+
+(provide 'gptel-context-persistence)
+;;; gptel-context-persistence.el ends here
+#+end_src
+
+** How to Use
+
+1. Start a gptel conversation in a buffer (M-x gptel)
+2. Add files or buffers to the context with gptel-context functions (comes with gptel)
+3. Save the context with a name: M-x gptel-context-save-as-named
+4. Start another gptel conversation in a different buffer
+5. Load the named context: M-x gptel-context-load-named
+6. Manage contexts with M-x gptel-context-manager (or C-c G c)
+
+Each gptel buffer has its own independent context, allowing you to maintain separate contexts for different conversations. When using `gptel-context-save-as-named`, the context is saved to a global registry with a name, which allows you to load it in other buffers using `gptel-context-load-named`.
+
+** Implementation Notes
+
+The key features that make per-buffer contexts work:
+
+1. We make `gptel-context--alist` buffer-local, ensuring each buffer has its own independent context
+2. We add a hook to initialize a fresh context for each new gptel buffer
+3. We use a global registry to store named contexts that can be loaded across different buffers
+4. We track which named context is active in each buffer with `gptel-context-current-name`
+
+This approach ensures that:
+- Each chat window has its own context that persists within that window
+- You can save contexts from one window and load them in another
+- Different chat windows can use completely different contexts simultaneously
