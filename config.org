@@ -921,7 +921,7 @@ Auths are from =secrets.el=.
 
         ;; OPTIONAL configuration
         (setq
-         gptel-model "claude-3-5-sonnet-20240620" ;  "claude-3-opus-20240229" also available
+         gptel-model "claude-3-7-sonnet-latest" ; https://docs.anthropic.com/en/docs/about-claude/models/all-models
          gptel-backend (gptel-make-anthropic "Claude"
                                :stream t :key 'anthropic-api-key)
          gptel-default-mode 'org-mode
