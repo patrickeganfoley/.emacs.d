@@ -26,6 +26,10 @@
 
 * Emacs Config
 
+This is for emacs insstalled from https://emacsformacosx.com/.  
+
+I could instead go with =brew install --cask emacs=. 
+
 Note - next time you upgrade emacs, you should delete all of `/straight/` and any compiled files.  
 
 #+begin_src bash
@@ -387,14 +391,48 @@ smex/amx - older version of replace search
 #+begin_src emacs-lisp
    (use-package vterm
      :ensure t
-     :config
-     ;; Make C-c k and C-c j behave the same as in term/ansi-term
-     (define-key vterm-mode-map (kbd "C-c k") 
-       (lambda () (interactive) (vterm-send-key "c" nil nil t)))
-     (define-key vterm-mode-map (kbd "C-c j") 'vterm-copy-mode))
+  :config
+  ;; Enable cursor line in vterm buffer when in "line mode"
+  (defvar-local vterm-line-mode nil
+    "Track whether we're in line mode (similar to ansi-term's line mode)")
+
+  ;; Function to toggle between "character mode" and "line mode"
+  (defun vterm-toggle-line-char-mode ()
+    "Toggle between line mode and char mode in vterm (similar to ansi-term)"
+    (interactive)
+    (if vterm-line-mode
+        (vterm-char-mode)
+      (vterm-line-mode)))
+
+  ;; Implement line mode
+  (defun vterm-line-mode ()
+    "Enable line mode in vterm (similar to ansi-term's line mode)"
+    (interactive)
+    (setq vterm-line-mode t)
+    (hl-line-mode 1)
+    (vterm-copy-mode)
+    (message "vterm line mode enabled"))
+
+  ;; Implement char mode
+  (defun vterm-char-mode ()
+    "Enable char mode in vterm (similar to ansi-term's char mode)"
+    (interactive)
+    (setq vterm-line-mode nil)
+    (hl-line-mode -1)
+    (vterm-copy-mode -1)
+    (message "vterm char mode enabled"))
+
+  ;; Bind the keys to match ansi-term
+  :bind (:map vterm-mode-map
+         ("C-c C-j" . vterm-line-mode)
+         ("C-c C-k" . vterm-char-mode)
+         :map vterm-copy-mode-map
+         ("C-c C-j" . vterm-line-mode)
+         ("C-c C-k" . vterm-char-mode)))
 #+end_src
 
 #+RESULTS:
+: vterm-char-mode
 
 ** Autocomplete
 The major autocompletion tools are company mode and auto-complete. company-mode is more actively maintained and has a better API for
