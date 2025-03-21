@@ -386,7 +386,12 @@ smex/amx - older version of replace search
 
 #+begin_src emacs-lisp
    (use-package vterm
-     :ensure t)
+     :ensure t
+     :config
+     ;; Make C-c k and C-c j behave the same as in term/ansi-term
+     (define-key vterm-mode-map (kbd "C-c k") 
+       (lambda () (interactive) (vterm-send-key "c" nil nil t)))
+     (define-key vterm-mode-map (kbd "C-c j") 'vterm-copy-mode))
 #+end_src
 
 #+RESULTS:
