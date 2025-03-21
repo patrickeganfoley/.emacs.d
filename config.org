@@ -586,7 +586,21 @@ Version 2018-09-07"
   :after org
   :init (add-hook 'org-mode-hook #'toc-org-enable)
 )
+
+(use-package org-modern
+  :straight t
+  :hook
+  (org-mode . org-modern-mode)
+  (org-agenda-mode . org-modern-agenda)
+  :config
+  (setq org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
+        org-modern-table-vertical 1
+        org-modern-table-horizontal 0.2
+        org-modern-list '((43 . "➤") (45 . "–") (42 . "•"))))
 #+end_src
+
+#+RESULTS:
+| org-modern-agenda |
 
 You can put =# -*- org-confirm-babel-evaluate: nil -*-=
 at the top of a document to avoid typing =yes= to 20+ src blocks.
