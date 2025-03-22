@@ -137,6 +137,10 @@ And let's try to open this file on startup.
   ;;  why does this not set at startup?
 )
 
+
+   (use-package beacon
+     :config (beacon-mode 1))
+
 ;;  Appearance
 (defun transparency (value)
   "Set the transparency of the frame window.
