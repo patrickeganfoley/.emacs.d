@@ -127,6 +127,9 @@ And let's try to open this file on startup.
 (use-package all-the-icons
   :if (display-graphic-p))
 
+   (use-package all-the-icons-dired
+     :hook (dired-mode . all-the-icons-dired-mode))
+
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :custom
