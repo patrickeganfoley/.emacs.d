@@ -26,9 +26,7 @@
 
 * Emacs Config
 
-This is for emacs insstalled from https://emacsformacosx.com/.  
-
-I could instead go with =brew install --cask emacs=. 
+Install emacs with =brew install --cask emacs=. 
 
 Note - next time you upgrade emacs, you should delete all of `/straight/` and any compiled files.  
 
