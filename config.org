@@ -1,4 +1,4 @@
-* Contents :TOC_3_gh:
+* Contents                                                         :TOC_3_gh:
 - [[#emacs-config][Emacs Config]]
   - [[#custom][Custom]]
   - [[#package-bootstrapping][Package Bootstrapping]]
@@ -50,7 +50,8 @@ Reload the config with ~load-init~.
 And let's try to open this file on startup.
 
 #+begin_src emacs-lisp
-(setq initial-buffer-choice "~/.emacs.d/config.org")
+(add-hook 'emacs-startup-hook
+          (lambda () (find-file "~/.emacs.d/config.org")))
 #+end_src
 
 ** Custom 
@@ -65,32 +66,19 @@ And let's try to open this file on startup.
 #+end_src
 ** Package Bootstrapping
 
+Package bootstrapping is in init.el.  We need to load org-mode before calling =(org-babel-load-file "~/.emacs.d/config.org")=.  
+
+straight and org installs are both in init.el.  
+
 #+begin_src emacs-lisp
 ;; Bootstrap straight.el
 ;; https://github.com/raxod502/straight.el#getting-started
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         ;; Don't _LOVE_ this from a security perspective.
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-(setq package-enable-at-startup nil)
+
 ;; M-x straight-check-<package/all>
 ;; M-x straight-rebuild-<package/all>
 ;;
 ;; Set straight-check-for-modifications to nil before the bootstrap if
 ;; you don't want straight to do automatic updating.
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
-
-(setq desktop-path '("~/.emacs.d/"))
 
 #+end_src
 
