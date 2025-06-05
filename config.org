@@ -963,31 +963,11 @@ Auths are from =secrets.el=.
 #+begin_src emacs-lisp
         (use-package gptel
           :straight t
-          :config
-          :bind (
-                 ("C-c g" . gptel)
+
+          :bind (("C-c g" . gptel)
                  ("C-c G" . gptel-send))
-          )
-
-
-
-  (setq gptel-default-mode 'org-mode)
-  ;; (setq gptel-model "gpt-4o")
-
-        (gptel-make-anthropic "Claude"          ;Any name you want
-          :stream t                             ;Streaming responses
-          :key 'anthropic-api-key)
-
-        ;; OPTIONAL configuration
-        (setq
-         gptel-model "claude-3-7-sonnet-latest" ; https://docs.anthropic.com/en/docs/about-claude/models/all-models
-         gptel-backend (gptel-make-anthropic "Claude"
-                               :stream t :key 'anthropic-api-key)
-         gptel-default-mode 'org-mode
-         gptel-max-tokens 5000
-         )
-
-
+          :config
+          (setq gptel-default-mode 'org-mode)
       ;; https://github.com/karthink/gptel/issues/351
       ;; for the 
       ;; Claude error: (HTTP/2 400) messages.2: all ;;messages must have non-empty content except ;; for the optional final assistant message
@@ -996,6 +976,11 @@ Auths are from =secrets.el=.
           (when (and font-lock-mode (derived-mode-p 'org-mode))
             (font-lock-update)))
       (add-hook 'gptel-post-response-functions #'my/gptel-font-lock-update)
+
+          ;; local
+          (load-file "~/.emacs.d/gptel-config.el")
+          )
+
 #+end_src
 
 #+RESULTS:
