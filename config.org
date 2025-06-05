@@ -1,3 +1,4 @@
+
 * Contents                                                         :TOC_3_gh:
 - [[#emacs-config][Emacs Config]]
   - [[#custom][Custom]]
@@ -449,7 +450,11 @@ Python has two major auto complete backends that work with company: jedi and rop
 
 I disable company in org-mode and shell, otherwise it messes with all the asteriskses. 
 ** Linters
+
 Flycheck is syntax checking specifically for emacs - it does not check syntax itself, but calls external programs.
+
+LSP-mode uses flycheck as its UI, it does not replace it.
+
 flymake is the built-in version of syntax checking.
 
 #+begin_src emacs-lisp
@@ -464,17 +469,7 @@ flymake is the built-in version of syntax checking.
    (setq flycheck-python-pycompile-executable "python3")
 #+end_src
 
-Python has several syntax checkers, pylint and flake8 are the main ones, and mypy does static type checking.
 
-You can make a config file for a repo with ~pylint --generate-rcfile > .pylintrc~
-
-For flake8, put things in setup.cfg with a [flake8] at the top of the file.
-
-You will also need to add a =.dir_locals.el= containing
-
-~((python-mode . ((flycheck-flake8rc . "setup.cfg"))))~
-
-flycheck uses https://github.com/jimhester/lintr for R
 ** Generic Editing
 Tools for block commenting, comment boxes, etc...
 
@@ -631,120 +626,134 @@ You can also use
 #+end_src
 ** Python
 
+
 #+begin_src emacs-lisp
-;; Let me try to redo my python setup to use lsp-mode.
-;; I'm following https://ianyepan.github.io/posts/emacs-ide/ and https://github.com/emacs-lsp/lsp-pyright
-;; I'd also like to do this for R so my emacs stops crashing.
-;; How does this work?
-;; With lsp - you have a client (the emacs lsp-mode package) and a server.
-;; Microsoft's pyright is the server we'll use.  We also need lsp-pyright as a layer
-;; between lsp-mode and the pyright server.
-(use-package lsp-mode
-  :straight t
-  :hook ((python-mode) . lsp-deferred)
-  :commands lsp)
 
-(use-package lsp-ui
-  :straight t
-  :commands lsp-ui-mode
-  :config
-  (setq lsp-ui-doc-header t)
-  (setq lsp-ui-doc-include-signature t)
-  (setq lsp-ui-doc-border (face-foreground 'default))
-  (setq lsp-ui-sideline-show-code-actions t)
-)
+  (use-package lsp-mode
+    :straight t
+    :commands lsp
+    :config
+    (setq lsp-disabled-clients nil)
+    (setq lsp-enabled-clients '(pyright ruff-lsp))
+    (setq lsp-diagnostics-provider :flycheck)
+    :hook
+    (python-mode . lsp))
 
-;; check out these settings
-;; (use-package lsp-ui
-;;   :commands lsp-ui-mode
-;;   :config
-;;   (setq lsp-ui-doc-enable nil)      
-;;   (setq lsp-ui-sideline-delay 0.05))
+   (use-package lsp-pyright
+     :ensure t
+     :hook (python-mode . (lambda ()
+                           (require 'lsp-pyright)
+                           (lsp))))
 
-;; Note - you'll need to run pip install pyright first.
-(use-package lsp-pyright
-  :straight t
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp)))
-  :config
-  (setq lsp-pyright-venv-directory "/~/venvs/")
-  (setq lsp-pyright-venv-path "/~/venvs/")
-  ;; Note!  See the pyvenv() function!  This determines the python executable!
-)
+  (with-eval-after-load 'lsp-mode
+    (add-to-list 'lsp-language-id-configuration
+                 '(python-mode . "python"))
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-stdio-connection "ruff-lsp")
+      :activation-fn (lsp-activate-on "python")
+      :priority -1
+      :server-id 'ruff-lsp)))
 
-
-(use-package pyvenv
-  :straight t
-  :init
-  (setenv "WORKON_HOME" "~/venvs/")
-  :config
-  (pyvenv-mode t)
-
-  ;; you want M-x pyvenv-activate RET dir_to_the_environment/env
-  ;; and then `C-c C-p`
-
-  ;; Set correct Python interpreter
-  (setq pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
-  (setq pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python3")))))
-
-(defun my_set_venv (venv)
-  "Tell flycheck to use pylint, flake8, etc.. from a VENV."
-  (interactive "sChoose a venv from ~/venvs/")
-  ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
-  (message "Setting pylint & flake8 for flycheck to use %s " venv)
-  (setq flycheck-python-pylint-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint")
-        )
-  (setq flycheck-python-flake8-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83")
-        )
-  (setq flycheck-python-flake8-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
-        )
-  (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
-  (setq lsp-pyright-python-executable-cmd
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/python")
-        )
-)
-
-
-(use-package blacken
-  :straight t
-  :config
-  ;;(add-hook 'python-mode-hook 'blacken-mode)
+  (use-package lsp-ui
+    :straight t
+    :commands lsp-ui-mode
+    :config
+    (setq lsp-ui-doc-enable t)
+    (setq lsp-ui-sideline-show-diagnostics t)
+    (setq lsp-ui-doc-position 'at-point)
   )
 
 
-(use-package py-yapf
-  :straight t
+  (use-package pyvenv
+    :straight t
+    :init
+    (setenv "WORKON_HOME" "~/venvs/")
+    :config
+    (pyvenv-mode t)
+
+    ;; you want M-x pyvenv-activate RET dir_to_the_environment/env
+    ;; and then `C-c C-p`
+
+    ;; Set correct Python interpreter
+    (setq pyvenv-post-activate-hooks
+          (list (lambda ()
+                  (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+    (setq pyvenv-post-deactivate-hooks
+          (list (lambda ()
+                  (setq python-shell-interpreter "python3")))))
+
+
+  (defun my_set_venv (venv)
+    "Tell flycheck to use pylint, flake8, etc.. from a VENV."
+    (interactive "sChoose a venv from ~/venvs/")
+    ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
+    (message "Setting pylint & flake8 for flycheck to use %s " venv)
+    (setq flycheck-python-pylint-executable
+          (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint")
+          )
+    (setq flycheck-python-flake8-executable
+          (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83")
+          )
+    (setq flycheck-python-flake8-executable
+          (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
+          )
+    (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
+    (setq lsp-pyright-python-executable-cmd
+          (concat "/Users/patrickfoley/venvs/" venv "/bin/python")
+          )
   )
 
-;;  EIN - Emacs IPython Notebook
-;;  Do not use the old repo maintained by tkf,
-;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
-;;  For some reason, ein:jupyter-server-start does not work
-;;  It all works fine if I open the notebook server in an eshell.
-;; See https://github.com/millejoh/emacs-ipython-notebook/issues/176#issuecomment-299512815
-;; for issues with being unable to log in.
-;;  Ein Notes:
-;;    run ein:notebooklist-login, use the password
-;;    
-(use-package ein
-  :straight t
-  :commands (ein:notebooklist-open)
-  :config
-  (defvar ein:jupyter-default-server-command)
-  (defvar ein:jupyter-server-args)
-  (setq ein:jupyter-default-server-command "~/venvs/sf3919/bin/jupyter"
-	ein:jupyter-server-args (list "--no-browser"))
-  (setq ein:output-area-inlined-images t)
-)
+
+  (use-package blacken
+    :straight t
+    :config
+    ;;(add-hook 'python-mode-hook 'blacken-mode)
+    )
+
+
+  (use-package py-yapf
+    :straight t
+    )
+
+  ;;  EIN - Emacs IPython Notebook
+  ;;  Do not use the old repo maintained by tkf,
+  ;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
+  ;;  For some reason, ein:jupyter-server-start does not work
+  ;;  It all works fine if I open the notebook server in an eshell.
+  ;; See https://github.com/millejoh/emacs-ipython-notebook/issues/176#issuecomment-299512815
+  ;; for issues with being unable to log in.
+  ;;  Ein Notes:
+  ;;    run ein:notebooklist-login, use the password
+  ;;    
+  (use-package ein
+    :straight t
+    :commands (ein:notebooklist-open)
+    :config
+    (defvar ein:jupyter-default-server-command)
+    (defvar ein:jupyter-server-args)
+    (setq ein:jupyter-default-server-command "~/venvs/sf39/bin/jupyter"
+  	ein:jupyter-server-args (list "--no-browser"))
+    (setq ein:output-area-inlined-images t)
+  )
 #+end_src
+
+#+RESULTS:
+: t
+
+Can I make the plots a bit smaller?
+
+#+begin_src emacs-lisp
+(defun my-ein-setup ()
+  (setq ein:output-area-inlined-images t)
+  (setq ein:slice-image t)
+  (setq ein:slice-image-data '(800 . nil)))  ; Width in pixels
+
+(add-hook 'ein:notebook-mode-hook 'my-ein-setup)
+#+end_src
+
+#+RESULTS:
+| my-ein-setup |
 
 ** R 
 
@@ -953,6 +962,7 @@ Auths are from =secrets.el=.
 
 #+begin_src emacs-lisp
         (use-package gptel
+          :straight t
           :config
           :bind (
                  ("C-c g" . gptel)
