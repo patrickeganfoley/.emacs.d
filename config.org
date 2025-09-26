@@ -23,6 +23,7 @@
     - [[#gptel][GPTel]]
     - [[#copilot][CoPilot]]
   - [[#misc--everything-else][Misc / Everything else]]
+  - [[#anki][Anki]]
 
 * Emacs Config
 
@@ -1166,9 +1167,19 @@ Version 2015-07-30
   :config (setq-default js-indent-level 4))
 
 (global-set-key (kbd "C-c C-f") 'beautify-json)
-
-
 #+end_src
+
+
+** Anki
+
+#+begin_src emacs-lisp
+(use-package anki-editor
+  :ensure t
+  :after org
+  :config
+  (setq anki-editor-create-decks t)) ;
+#+end_src
+
 
 
 #+begin_src emacs-lisp
