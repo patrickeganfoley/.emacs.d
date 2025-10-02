@@ -759,45 +759,47 @@ Can I make the plots a bit smaller?
 ** Elisp
 
 #+begin_src emacs-lisp
-(use-package
- elisp-autofmt
- :straight (:host codeberg :repo "ideasman42/emacs-elisp-autofmt")
- :hook
- ((emacs-lisp-mode . elisp-autofmt-mode)
-  (org-mode . my/elisp-autofmt-org-mode))
- :config
- ;; Format elisp blocks in org files
- ;;  (setq elisp-autofmt-python-bin "~/.asdf/shims/python3")
+;; Elisp formatting with elisp-autofmt
+(use-package elisp-autofmt
+  :straight (:host codeberg :repo "ideasman42/emacs-elisp-autofmt")
+  :commands (elisp-autofmt-mode elisp-autofmt-buffer elisp-autofmt-region)
+  :hook (emacs-lisp-mode . elisp-autofmt-mode)
+  :config
+  ;; Set Python path explicitly
+  (setq elisp-autofmt-python-bin "/Users/patrickfoley/.asdf/shims/python3"))
 
-  (defun my/format-elisp-in-org-buffer ()
-    "Format all elisp src blocks in current org buffer"
-    (interactive)
-    (when (derived-mode-p 'org-mode)
-      (save-excursion
-        (goto-char (point-min))
-        (while (re-search-forward "^[ \t]*#\\+begin_src\\s-+elisp" nil t)
-          (org-backward-element)
-          (org-babel-mark-block)
-          (org-edit-special)
-          (elisp-autofmt-buffer)
-          (org-edit-src-exit))))))
+;; Function to format elisp src blocks in org files
+(defun my/format-elisp-src-blocks ()
+  "Format all emacs-lisp src blocks in the current org buffer."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^#\\+begin_src emacs-lisp" nil t)
+      (let* ((element (org-element-at-point))
+             (begin (org-element-property :begin element))
+             (end (org-element-property :end element))
+             (value (org-element-property :value element)))
+        (when value
+          ;; Format the code using elisp-autofmt
+          (let ((formatted (with-temp-buffer
+                             (emacs-lisp-mode)
+                             (insert value)
+                             (elisp-autofmt-buffer)
+                             (buffer-string))))
+            ;; Replace the src block content
+            (goto-char begin)
+            (when (re-search-forward "^#\\+begin_src emacs-lisp.*\n" end t)
+              (let ((content-start (point)))
+                (when (re-search-forward "^#\\+end_src" end t)
+                  (beginning-of-line)
+                  (delete-region content-start (point))
+                  (insert formatted))))))
+        ;; Move past this block
+        (goto-char (or end (point-max)))))))
 
-
-;; Auto-format on save
-(defun my/setup-org-elisp-format ()
-  "Setup formatting for config.org"
-  (when (and buffer-file-name
-             (string-match "config\\.org$" buffer-file-name))
-    (add-hook 'before-save-hook #'my/format-elisp-in-org-buffer nil t)))
-
-(add-hook 'org-mode-hook #'my/setup-org-elisp-format)
-
-;; Global keybinding for manual formatting
-(global-set-key (kbd "C-c f o") 'my/format-elisp-in-org-buffer)
+;; Keybinding to manually format org elisp blocks
+(global-set-key (kbd "C-c f e") 'my/format-elisp-src-blocks)
 #+end_src
-
-#+RESULTS:
-: my/format-elisp-in-org-buffer
 
 ** R 
 
