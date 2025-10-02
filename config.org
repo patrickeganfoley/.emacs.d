@@ -47,6 +47,7 @@ Reload the config with ~load-init~.
   "Reload the init file.  I am learning how to write elisp."
   (interactive) ;; Do I need this for everything??
   (message "Reloading init.el...")
+
   (load-file "~/.emacs.d/init.el"))
 #+end_src
 
@@ -384,46 +385,50 @@ smex/amx - older version of replace search
 ** v-term
 
 #+begin_src emacs-lisp
-   (use-package vterm
-     :ensure t
-  :config
-  ;; Enable cursor line in vterm buffer when in "line mode"
-  (defvar-local vterm-line-mode nil
-    "Track whether we're in line mode (similar to ansi-term's line mode)")
+(use-package
+ vterm
+ :ensure t
+ :config
+ ;; Enable cursor line in vterm buffer when in "line mode"
+ (defvar-local vterm-line-mode nil
+   "Track whether we're in line mode (similar to ansi-term's line mode)")
 
-  ;; Function to toggle between "character mode" and "line mode"
-  (defun vterm-toggle-line-char-mode ()
-    "Toggle between line mode and char mode in vterm (similar to ansi-term)"
-    (interactive)
-    (if vterm-line-mode
-        (vterm-char-mode)
-      (vterm-line-mode)))
+ ;; Function to toggle between "character mode" and "line mode"
+ (defun vterm-toggle-line-char-mode ()
+   "Toggle between line mode and char mode in vterm (similar to ansi-term)"
+   (interactive)
+   (if vterm-line-mode
+       (vterm-char-mode)
+     (vterm-line-mode)))
 
-  ;; Implement line mode
-  (defun vterm-line-mode ()
-    "Enable line mode in vterm (similar to ansi-term's line mode)"
-    (interactive)
-    (setq vterm-line-mode t)
-    (hl-line-mode 1)
-    (vterm-copy-mode)
-    (message "vterm line mode enabled"))
+ ;; Implement line mode
+ (defun vterm-line-mode ()
+   "Enable line mode in vterm (similar to ansi-term's line mode)"
+   (interactive)
+   (setq vterm-line-mode t)
+   (hl-line-mode 1)
+   (vterm-copy-mode)
+   (message "vterm line mode enabled"))
 
-  ;; Implement char mode
-  (defun vterm-char-mode ()
-    "Enable char mode in vterm (similar to ansi-term's char mode)"
-    (interactive)
-    (setq vterm-line-mode nil)
-    (hl-line-mode -1)
-    (vterm-copy-mode -1)
-    (message "vterm char mode enabled"))
+ ;; Implement char mode
+ (defun vterm-char-mode ()
+   "Enable char mode in vterm (similar to ansi-term's char mode)"
+   (interactive)
+   (setq vterm-line-mode nil)
+   (hl-line-mode -1)
+   (vterm-copy-mode -1)
+   (message "vterm char mode enabled"))
 
-  ;; Bind the keys to match ansi-term
-  :bind (:map vterm-mode-map
-         ("C-c C-j" . vterm-line-mode)
-         ("C-c C-k" . vterm-char-mode)
-         :map vterm-copy-mode-map
-         ("C-c C-j" . vterm-line-mode)
-         ("C-c C-k" . vterm-char-mode)))
+ ;; Bind the keys to match ansi-term
+ :bind
+ (:map
+  vterm-mode-map
+  ("C-c C-j" . vterm-line-mode)
+  ("C-c C-k" . vterm-char-mode)
+  :map
+  vterm-copy-mode-map
+  ("C-c C-j" . vterm-line-mode)
+  ("C-c C-k" . vterm-char-mode)))
 #+end_src
 
 #+RESULTS:
@@ -544,49 +549,51 @@ Version 2018-09-07"
 ** Org-mode
 
 #+begin_src emacs-lisp
-  (require 'ox-md nil t)
+(require 'ox-md nil t)
 
-  (setq org-hide-emphasis-markers t)
+(setq org-hide-emphasis-markers t)
 
-  (add-hook 'org-mode-hook 'org-indent-mode)
-  ;; (add-hook 'org-mode-hook 'variable-pitch-mode)
-  (add-hook 'org-mode-hook 'visual-line-mode)
+(add-hook 'org-mode-hook 'org-indent-mode)
+;; (add-hook 'org-mode-hook 'variable-pitch-mode)
+(add-hook 'org-mode-hook 'visual-line-mode)
 
-  ;; Don't add new lines
-  (setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
+;; Don't add new lines
+(setf org-blank-before-new-entry
+      '((heading . nil) (plain-list-item . nil)))
 
-  ;; subscripts/superscripts 
-  ;; https://orgmode.org/manual/Subscripts-and-Superscripts.html#Subscripts-and-Superscripts
-  (setq org-pretty-entities t)
-  (setq org-pretty-entities-include-sub-superscripts t)
+;; subscripts/superscripts 
+;; https://orgmode.org/manual/Subscripts-and-Superscripts.html#Subscripts-and-Superscripts
+(setq org-pretty-entities t)
+(setq org-pretty-entities-include-sub-superscripts t)
 
-  ;; kanban
-  (use-package org-kanban
-    :straight t
-    :config 
-    (setq
-     org-kanban/layout '("..." . 24)
-     org-kanban/next-keys "tf"
-     org-kanban/prev-keys "tb"
-    )
-  )
+;; kanban
+(use-package
+ org-kanban
+ :straight t
+ :config
+ (setq
+  org-kanban/layout '("..." . 24)
+  org-kanban/next-keys "tf"
+  org-kanban/prev-keys "tb"))
 
-(use-package toc-org
-  :straight t
-  :after org
-  :init (add-hook 'org-mode-hook #'toc-org-enable)
-)
+(use-package
+ toc-org
+ :straight t
+ :after org
+ :init (add-hook 'org-mode-hook #'toc-org-enable))
 
-(use-package org-modern
-  :straight t
-  :hook
-  (org-mode . org-modern-mode)
-  (org-agenda-mode . org-modern-agenda)
-  :config
-  (setq org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
-        org-modern-table-vertical 1
-        org-modern-table-horizontal 0.2
-        org-modern-list '((43 . "➤") (45 . "–") (42 . "•"))))
+(use-package
+ org-modern
+ :straight t
+ :hook
+ (org-mode . org-modern-mode)
+ (org-agenda-mode . org-modern-agenda)
+ :config
+ (setq
+  org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
+  org-modern-table-vertical 1
+  org-modern-table-horizontal 0.2
+  org-modern-list '((43 . "➤") (45 . "–") (42 . "•"))))
 #+end_src
 
 #+RESULTS:
@@ -632,113 +639,113 @@ You can also use
 
 #+begin_src emacs-lisp
 
-  (use-package lsp-mode
-    :straight t
-    :commands lsp
-    :config
-    (setq lsp-disabled-clients nil)
-    (setq lsp-enabled-clients '(pyright ruff-lsp))
-    (setq lsp-diagnostics-provider :flycheck)
-    :hook
-    (python-mode . lsp))
+(use-package
+ lsp-mode
+ :straight t
+ :commands lsp
+ :config
+ (setq lsp-disabled-clients nil)
+ (setq lsp-enabled-clients '(pyright ruff-lsp))
+ (setq lsp-diagnostics-provider :flycheck)
+ :hook (python-mode . lsp))
 
-   (use-package lsp-pyright
-     :ensure t
-     :hook (python-mode . (lambda ()
-                           (require 'lsp-pyright)
-                           (lsp))))
+(use-package
+ lsp-pyright
+ :ensure t
+ :hook
+ (python-mode
+  .
+  (lambda ()
+    (require 'lsp-pyright)
+    (lsp))))
 
-  (with-eval-after-load 'lsp-mode
-    (add-to-list 'lsp-language-id-configuration
-                 '(python-mode . "python"))
-    (lsp-register-client
-     (make-lsp-client
-      :new-connection (lsp-stdio-connection "ruff-lsp")
-      :activation-fn (lsp-activate-on "python")
-      :priority -1
-      :server-id 'ruff-lsp)))
+(with-eval-after-load 'lsp-mode
+  (add-to-list
+   'lsp-language-id-configuration '(python-mode . "python"))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection
+    (lsp-stdio-connection "ruff-lsp")
+    :activation-fn (lsp-activate-on "python")
+    :priority -1
+    :server-id 'ruff-lsp)))
 
-  (use-package lsp-ui
-    :straight t
-    :commands lsp-ui-mode
-    :config
-    (setq lsp-ui-doc-enable t)
-    (setq lsp-ui-sideline-show-diagnostics t)
-    (setq lsp-ui-doc-position 'at-point)
-  )
-
-
-  (use-package pyvenv
-    :straight t
-    :init
-    (setenv "WORKON_HOME" "~/venvs/")
-    :config
-    (pyvenv-mode t)
-
-    ;; you want M-x pyvenv-activate RET dir_to_the_environment/env
-    ;; and then `C-c C-p`
-
-    ;; Set correct Python interpreter
-    (setq pyvenv-post-activate-hooks
-          (list (lambda ()
-                  (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
-    (setq pyvenv-post-deactivate-hooks
-          (list (lambda ()
-                  (setq python-shell-interpreter "python3")))))
+(use-package
+ lsp-ui
+ :straight t
+ :commands lsp-ui-mode
+ :config
+ (setq lsp-ui-doc-enable t)
+ (setq lsp-ui-sideline-show-diagnostics t)
+ (setq lsp-ui-doc-position 'at-point))
 
 
-  (defun my_set_venv (venv)
-    "Tell flycheck to use pylint, flake8, etc.. from a VENV."
-    (interactive "sChoose a venv from ~/venvs/")
-    ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
-    (message "Setting pylint & flake8 for flycheck to use %s " venv)
-    (setq flycheck-python-pylint-executable
-          (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint")
-          )
-    (setq flycheck-python-flake8-executable
-          (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83")
-          )
-    (setq flycheck-python-flake8-executable
-          (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82")
-          )
-    (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
-    (setq lsp-pyright-python-executable-cmd
-          (concat "/Users/patrickfoley/venvs/" venv "/bin/python")
-          )
-  )
+(use-package
+ pyvenv
+ :straight t
+ :init (setenv "WORKON_HOME" "~/venvs/")
+ :config (pyvenv-mode t)
+
+ ;; you want M-x pyvenv-activate RET dir_to_the_environment/env
+ ;; and then `C-c C-p`
+
+ ;; Set correct Python interpreter
+ (setq pyvenv-post-activate-hooks
+       (list
+        (lambda ()
+          (setq python-shell-interpreter
+                (concat pyvenv-virtual-env "bin/python3")))))
+ (setq pyvenv-post-deactivate-hooks
+       (list (lambda () (setq python-shell-interpreter "python3")))))
 
 
-  (use-package blacken
-    :straight t
-    :config
-    ;;(add-hook 'python-mode-hook 'blacken-mode)
-    )
+(defun my_set_venv (venv)
+  "Tell flycheck to use pylint, flake8, etc.. from a VENV."
+  (interactive "sChoose a venv from ~/venvs/")
+  ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
+  (message "Setting pylint & flake8 for flycheck to use %s " venv)
+  (setq flycheck-python-pylint-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83"))
+  (setq flycheck-python-flake8-executable
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82"))
+  (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
+  (setq lsp-pyright-python-executable-cmd
+        (concat "/Users/patrickfoley/venvs/" venv "/bin/python")))
 
 
-  (use-package py-yapf
-    :straight t
-    )
+(use-package
+ blacken
+ :straight t
+ :config
+ ;;(add-hook 'python-mode-hook 'blacken-mode)
+ )
 
-  ;;  EIN - Emacs IPython Notebook
-  ;;  Do not use the old repo maintained by tkf,
-  ;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
-  ;;  For some reason, ein:jupyter-server-start does not work
-  ;;  It all works fine if I open the notebook server in an eshell.
-  ;; See https://github.com/millejoh/emacs-ipython-notebook/issues/176#issuecomment-299512815
-  ;; for issues with being unable to log in.
-  ;;  Ein Notes:
-  ;;    run ein:notebooklist-login, use the password
-  ;;    
-  (use-package ein
-    :straight t
-    :commands (ein:notebooklist-open)
-    :config
-    (defvar ein:jupyter-default-server-command)
-    (defvar ein:jupyter-server-args)
-    (setq ein:jupyter-default-server-command "~/venvs/sf39/bin/jupyter"
-  	ein:jupyter-server-args (list "--no-browser"))
-    (setq ein:output-area-inlined-images t)
-  )
+
+(use-package py-yapf :straight t)
+
+;;  EIN - Emacs IPython Notebook
+;;  Do not use the old repo maintained by tkf,
+;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
+;;  For some reason, ein:jupyter-server-start does not work
+;;  It all works fine if I open the notebook server in an eshell.
+;; See https://github.com/millejoh/emacs-ipython-notebook/issues/176#issuecomment-299512815
+;; for issues with being unable to log in.
+;;  Ein Notes:
+;;    run ein:notebooklist-login, use the password
+;;    
+(use-package
+ ein
+ :straight t
+ :commands (ein:notebooklist-open)
+ :config
+ (defvar ein:jupyter-default-server-command)
+ (defvar ein:jupyter-server-args)
+ (setq
+  ein:jupyter-default-server-command "~/venvs/sf39/bin/jupyter"
+  ein:jupyter-server-args (list "--no-browser"))
+ (setq ein:output-area-inlined-images t))
 #+end_src
 
 #+RESULTS:
@@ -805,6 +812,15 @@ Can I make the plots a bit smaller?
 
 ;; Keybinding to manually format org elisp blocks
 (global-set-key (kbd "C-c f e") 'my/format-elisp-src-blocks)
+
+;; Auto-format config.org on save
+(defun my/auto-format-config-org ()
+  "Auto-format elisp blocks in config.org before saving."
+  (when (and buffer-file-name
+             (string-match-p "config\\.org$" buffer-file-name))
+    (my/format-elisp-src-blocks)))
+
+(add-hook 'before-save-hook 'my/auto-format-config-org)
 #+end_src
 
 ** R 
@@ -1320,21 +1336,21 @@ First some generic sql setup.
 
 #+begin_src emacs-lisp
 ;; Scala
-(use-package scala-mode
-  :straight t
-  :interpreter
-  ("scala" . scala-mode))
+(use-package
+ scala-mode
+ :straight t
+ :interpreter ("scala" . scala-mode))
 
 ;; Golang
-(use-package go-mode
-  :straight t
-  :init
-  (progn
-    (setq gofmt-command "goimports")
-    (add-hook 'before-save-hook 'gofmt-before-save)
-    (bind-key [remap find-tag] #'godef-jump))
-  :config
-  (add-hook 'go-mode-hook 'electric-pair-mode))
+(use-package
+ go-mode
+ :straight t
+ :init
+ (progn
+   (setq gofmt-command "goimports")
+   (add-hook 'before-save-hook 'gofmt-before-save)
+   (bind-key [remap find-tag] #'godef-jump))
+ :config (add-hook 'go-mode-hook 'electric-pair-mode))
 #+end_src
 ** LLMs
 
@@ -1343,26 +1359,23 @@ Auths are from =secrets.el=.
 *** GPTel
 
 #+begin_src emacs-lisp
-        (use-package gptel
-          :straight t
+(use-package
+ gptel
+ :straight t
 
-          :bind (("C-c g" . gptel)
-                 ("C-c G" . gptel-send))
-          :config
-          (setq gptel-default-mode 'org-mode)
-      ;; https://github.com/karthink/gptel/issues/351
-      ;; for the 
-      ;; Claude error: (HTTP/2 400) messages.2: all ;;messages must have non-empty content except ;; for the optional final assistant message
-      ;;issue 
-      (defun my/gptel-font-lock-update (&rest _)
-          (when (and font-lock-mode (derived-mode-p 'org-mode))
-            (font-lock-update)))
-      (add-hook 'gptel-post-response-functions #'my/gptel-font-lock-update)
+ :bind (("C-c g" . gptel) ("C-c G" . gptel-send))
+ :config (setq gptel-default-mode 'org-mode)
+ ;; https://github.com/karthink/gptel/issues/351
+ ;; for the 
+ ;; Claude error: (HTTP/2 400) messages.2: all ;;messages must have non-empty content except ;; for the optional final assistant message
+ ;;issue 
+ (defun my/gptel-font-lock-update (&rest _)
+   (when (and font-lock-mode (derived-mode-p 'org-mode))
+     (font-lock-update)))
+ (add-hook 'gptel-post-response-functions #'my/gptel-font-lock-update)
 
-          ;; local
-          (load-file "~/.emacs.d/gptel-config.el")
-          )
-
+ ;; local
+ (load-file "~/.emacs.d/gptel-config.el"))
 #+end_src
 
 #+RESULTS:
