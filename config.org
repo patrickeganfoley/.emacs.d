@@ -636,39 +636,28 @@ You can also use
 #+end_src
 ** Python
 
+External dependencies (install these system-wide or in venvs):
+- =pip install pyright= (LSP server for type checking)
+- =pip install ruff-lsp= (Fast linter via LSP)
+- Optional: =pip install black= (code formatter)
+- Optional: =pip install yapf= (alternative formatter)
 
 #+begin_src emacs-lisp
 
 (use-package
  lsp-mode
  :straight t
+ :hook (python-mode . lsp)
  :commands lsp
  :config
- (setq lsp-disabled-clients nil)
+ ;; Use both pyright (type checking) and ruff (linting)
  (setq lsp-enabled-clients '(pyright ruff-lsp))
- (setq lsp-diagnostics-provider :flycheck)
- :hook (python-mode . lsp))
+ (setq lsp-diagnostics-provider :flycheck))
 
 (use-package
  lsp-pyright
- :ensure t
- :hook
- (python-mode
-  .
-  (lambda ()
-    (require 'lsp-pyright)
-    (lsp))))
-
-(with-eval-after-load 'lsp-mode
-  (add-to-list
-   'lsp-language-id-configuration '(python-mode . "python"))
-  (lsp-register-client
-   (make-lsp-client
-    :new-connection
-    (lsp-stdio-connection "ruff-lsp")
-    :activation-fn (lsp-activate-on "python")
-    :priority -1
-    :server-id 'ruff-lsp)))
+ :straight t
+ :after lsp-mode)
 
 (use-package
  lsp-ui
@@ -699,18 +688,12 @@ You can also use
        (list (lambda () (setq python-shell-interpreter "python3")))))
 
 
+;; LSP handles linting via pyright + ruff-lsp, so we don't need separate
+;; flycheck linters. Just point LSP to the right Python interpreter per venv.
 (defun my_set_venv (venv)
-  "Tell flycheck to use pylint, flake8, etc.. from a VENV."
+  "Point LSP to the Python interpreter in VENV."
   (interactive "sChoose a venv from ~/venvs/")
-  ;; (setq-local pylintexec (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
-  (message "Setting pylint & flake8 for flycheck to use %s " venv)
-  (setq flycheck-python-pylint-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/pylint"))
-  (setq flycheck-python-flake8-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake83"))
-  (setq flycheck-python-flake8-executable
-        (concat "/Users/patrickfoley/venvs/" venv "/bin/flake82"))
-  (message "Setting lsp-pyright-python-executable-cmd  %s " venv)
+  (message "Setting LSP Python interpreter to %s" venv)
   (setq lsp-pyright-python-executable-cmd
         (concat "/Users/patrickfoley/venvs/" venv "/bin/python")))
 
@@ -765,6 +748,9 @@ Can I make the plots a bit smaller?
 #+RESULTS:
 | my-ein-setup |
 ** Elisp
+
+External dependencies:
+- =python3= (Python 3.9+) - elisp-autofmt requires Python
 
 #+begin_src emacs-lisp
 ;; Elisp formatting with elisp-autofmt
