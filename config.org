@@ -728,13 +728,6 @@ You can also use
 ;;  EIN - Emacs IPython Notebook
 ;;  Do not use the old repo maintained by tkf,
 ;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
-;;  For some reason, ein:jupyter-server-start does not work
-;;  It all works fine if I open the notebook server in an eshell.
-;; See https://github.com/millejoh/emacs-ipython-notebook/issues/176#issuecomment-299512815
-;; for issues with being unable to log in.
-;;  Ein Notes:
-;;    run ein:notebooklist-login, use the password
-;;    
 (use-package
  ein
  :straight t
