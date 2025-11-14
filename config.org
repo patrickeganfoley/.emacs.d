@@ -17,7 +17,6 @@
   - [[#markdown][Markdown]]
   - [[#python][Python]]
   - [[#elisp][Elisp]]
-  - [[#r][R]]
   - [[#sql][SQL]]
   - [[#other-languages][Other Languages]]
   - [[#llms][LLMs]]
@@ -39,6 +38,12 @@ find ~/.emacs.d -name "*.elc" -delete
 #+end_src
 
 You'll also want to run =all-the-icons-install-fonts=.
+
+
+debug.
+#+begin_src emacs-lisp
+(setq debug-on-error t)
+#+end_src
 
 Reload the config with ~load-init~.
 
@@ -266,10 +271,22 @@ Commands to remember:
    (setq magit-branch-arguments '()) ;do NOT want --track
    (setq magit-push-arguments '("--set-upstream")))) ;aka -u
 
-(use-package forge :after magit)
+
+(use-package
+ forge
+ :after magit
+ :init
+ (setq forge-database-connector 'sqlite-builtin)
+ (setq forge-topic-view-fetch-comments t))
+
+(setq auth-sources '("~/.authinfo"))
+(setq auth-source-cache-expiry 0)
+(setq auth-source-debug t)
+;;(setq forge-topic-list-limit '(60 . 20))      ; (owned . others)
+;;(setq forge-owned-accounts '("patrickeganfoley"))
 #+end_src
 
-I might want to add back =(use-package forge :after magit)=, but currently it's causing trouble with https://github.com/magit/forge/issues/535#issuecomment-1387734805 
+
 
 ** Buffer / Window Navigation
 #+begin_src emacs-lisp
@@ -715,22 +732,49 @@ You can also use
         (concat "/Users/patrickfoley/venvs/" venv "/bin/python")))
 
 
-(use-package
- blacken
- :straight t
- :config
- ;;(add-hook 'python-mode-hook 'blacken-mode)
- )
+;; (use-package
+;;  blacken
+;;  :straight t
+;;  :config
+;;  ;;(add-hook 'python-mode-hook 'blacken-mode)
+;;  )
+
+;; (use-package
+;;  treesit-auto
+;;  :straight t
+;;  :config (global-treesit-auto-mode))
+
+;; ;; Prefer tree-sitter Python and keep LSP working
+;; (when (and (fboundp 'python-ts-mode) (boundp 'major-mode-remap-alist))
+;;   (add-to-list
+;;    'major-mode-remap-alist '(python-mode . python-ts-mode)))
+
+;; (add-hook 'python-ts-mode-hook #'lsp)
+
+(with-eval-after-load 'lsp-mode
+  (add-to-list
+   'lsp-language-id-configuration '(python-ts-mode . "python")))
 
 
-(use-package py-yapf :straight t)
+;; Ensure polymode never auto-initializes (prevents pm--mode-setup recursion)
+(with-eval-after-load 'polymode
+  (ignore-errors
+    (pm-global-mode -1))
+  (remove-hook 'after-change-major-mode-hook #'pm--mode-setup))
+
 
 ;;  EIN - Emacs IPython Notebook
 ;;  Do not use the old repo maintained by tkf,
 ;;  check out the new one at https://github.com/millejoh/emacs-ipython-notebook
 (use-package
  ein
- :straight t
+ :straight
+ '(ein
+   :type git
+   :host github
+   :repo "natsirtguy/emacs-ipython-notebook"
+   :branch "fix-polymode-compatibility")
+ :init (setq ein:polymode nil)
  :commands (ein:notebooklist-open)
  :config
  (defvar ein:jupyter-default-server-command)
@@ -757,6 +801,8 @@ Can I make the plots a bit smaller?
 
 #+RESULTS:
 | my-ein-setup |
+
+
 ** Elisp
 
 #+begin_src emacs-lisp
@@ -816,34 +862,7 @@ Can I make the plots a bit smaller?
 (add-hook 'before-save-hook 'my/auto-format-config-org)
 #+end_src
 
-** R 
 
-#+begin_src emacs-lisp
-;; R Rlang R ESS 
-
-(use-package
- ess
- :straight t
- :mode (("\\.r\\'" . r-mode) ("\\.R\\'" . r-mode))
- :init (require 'ess-r-mode))
-
-(use-package
- polymode
- :straight t
- :commands (poly-markdown+r-mode)
- :mode
- (("\\.rmd\\'" . poly-markdown+r-mode)
-  ("\\.Rmd\\'" . poly-markdown+r-mode)))
-
-(use-package
- poly-markdown
- :straight t
- :mode (("\\.md\\'" . poly-markdown-mode)))
-
-(use-package poly-R :straight t)
-
-(org-babel-do-load-languages 'org-babel-load-languages '((R . t)))
-#+end_src
 ** SQL
 
 This is all based off https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client
